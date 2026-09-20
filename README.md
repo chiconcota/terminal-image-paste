@@ -30,7 +30,7 @@
 Clone the repository and symlink `tip` to your local bin directory:
 
 ```bash
-git clone https://github.com/<username>/terminal-image-paste.git
+git clone https://github.com/chiconcota/terminal-image-paste.git
 cd terminal-image-paste
 
 # Link to your PATH
