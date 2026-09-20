@@ -61,6 +61,30 @@ _tip_get_image_mime_x11() {
     return 1
 }
 
+_tip_find_existing_image() {
+    local target_file="$1"
+    local target_dir="$2"
+
+    if [[ -s "$target_file" ]]; then
+        echo "$target_file"
+        return 0
+    fi
+
+    if [[ -s "${target_dir}/clipboard.png" ]]; then
+        echo "${target_dir}/clipboard.png"
+        return 0
+    fi
+
+    local latest_img
+    latest_img=$(ls -t "${target_dir}"/clip_*.png 2>/dev/null | head -n 1)
+    if [[ -n "$latest_img" && -s "$latest_img" ]]; then
+        echo "$latest_img"
+        return 0
+    fi
+
+    return 1
+}
+
 tip_clipboard_extract() {
     local display_server
     display_server=$(tip_detect_display_server)
@@ -73,7 +97,13 @@ tip_clipboard_extract() {
         local mime
         mime=$(_tip_get_image_mime_wayland)
         if [[ -z "$mime" ]]; then
-            tip_log_warn "No image data found in Wayland clipboard."
+            local existing_img
+            if existing_img=$(_tip_find_existing_image "$target_file" "$target_dir"); then
+                tip_log_info "No new image in clipboard. Reusing existing image: $existing_img"
+                echo "$existing_img"
+                return 0
+            fi
+            tip_log_warn "No image data found in Wayland clipboard and no previous image exists."
             echo "Error: Clipboard does not contain image data (or wl-paste is missing)." >&2
             return 1
         fi
@@ -87,7 +117,13 @@ tip_clipboard_extract() {
         local mime
         mime=$(_tip_get_image_mime_x11)
         if [[ -z "$mime" ]]; then
-            tip_log_warn "No image data found in X11 clipboard."
+            local existing_img
+            if existing_img=$(_tip_find_existing_image "$target_file" "$target_dir"); then
+                tip_log_info "No new image in clipboard. Reusing existing image: $existing_img"
+                echo "$existing_img"
+                return 0
+            fi
+            tip_log_warn "No image data found in X11 clipboard and no previous image exists."
             echo "Error: Clipboard does not contain image data (or xclip is missing)." >&2
             return 1
         fi

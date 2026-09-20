@@ -15,6 +15,18 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-21 - 🟢 Cơ chế Paste Clipboard Injection, Smart Fallback & Trình cài đặt Đa Distro
+- **Bối cảnh:** 
+  1. `wtype` gõ từng ký tự bị Chromium/Electron (VS Code, Antigravity IDE) nhận nhầm scancode 1 thành Escape (`^[`) và scancode 14 thành Backspace (xóa mất chữ `d`).
+  2. Người dùng muốn nhấn phím tắt bất kỳ lúc nào cũng dán được đường dẫn ảnh `/tmp/clipboard.png` mà không bị báo lỗi cứng nhắc khi clipboard tạm thời chưa có ảnh mới.
+  3. Cần hỗ trợ cài đặt trên Arch (AUR), Ubuntu/Debian, Fedora và openSUSE.
+- **Quyết định:**
+  1. **Clipboard Injection:** Chuyển sang cơ chế nạp chuỗi vào `wl-copy` / `xclip` rồi mô phỏng phím `Ctrl+Shift+V` kèm độ trễ `0.1s` nhả phím tắt. Tốc độ dán tức thì (0ms), không lỗi scancode, không xung đột bộ gõ tiếng Việt Fcitx5.
+  2. **Smart Fallback:** Khi clipboard không có ảnh mới, tự động tái sử dụng `/tmp/clipboard.png` gần nhất thay vì dừng lại báo lỗi.
+  3. **Multi-Distro Installer (`install.sh`):** Tự phát hiện package manager (`pacman`, `apt`, `dnf`, `zypper`), hỗ trợ dual mode (`--system` / `--user`), chạy chẩn đoán `tip doctor` sau cài đặt, hỗ trợ `--uninstall`.
+  4. **AUR Package:** Tạo `aur/PKGBUILD` và sinh `aur/.SRCINFO` chuẩn Arch Linux (`terminal-image-paste-git`).
+  5. **Dynamic Library Resolution:** Cập nhật `bin/tip` tự động tìm kiếm thư viện tại `/usr/lib/tip`, `/usr/local/lib/tip`, hoặc `~/.local/lib/tip`.
+
 ### 2026-09-20 - 🟢 Quốc tế hóa tiếng Anh & Phát hành chính thức lên GitHub
 - **Bối cảnh:** Dự án cần sẵn sàng cho cộng đồng mã nguồn mở quốc tế sử dụng.
 - **Quyết định:**

@@ -23,22 +23,45 @@
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Installation & Quick Start
 
-### 1. Installation
+### Option 1: Arch Linux (AUR)
 
-Clone the repository and symlink `tip` to your local bin directory:
+If you are using Arch Linux, Manjaro, or any Arch-based distro, install via your preferred AUR helper:
+
+```bash
+# Using paru
+paru -S terminal-image-paste-git
+
+# Using yay
+yay -S terminal-image-paste-git
+```
+
+### Option 2: Automated 1-Line Installer (Arch, Ubuntu/Debian, Fedora)
+
+The automated script auto-detects your distribution, checks dependencies, and installs `tip`:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/chiconcota/terminal-image-paste/main/install.sh | bash
+```
+
+Or clone and run locally:
 
 ```bash
 git clone https://github.com/chiconcota/terminal-image-paste.git
 cd terminal-image-paste
 
-# Link to your PATH
-mkdir -p ~/.local/bin
-ln -sf "$(pwd)/bin/tip" ~/.local/bin/tip
+# Install for current user (~/.local/bin)
+./install.sh --user
+
+# Or install system-wide (requires sudo)
+sudo ./install.sh --system
 ```
 
-Ensure `~/.local/bin` is in your `$PATH`.
+To uninstall at any time:
+```bash
+./install.sh --uninstall
+```
 
 ### 2. Verify Dependencies
 

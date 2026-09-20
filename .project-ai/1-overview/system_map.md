@@ -1,5 +1,5 @@
 # SYSTEM MAP: TERMINAL IMAGE PASTE (`tip`)
-@status: 🟡 PLANNING & ARCHITECTURE | @git_branch: main | @last_update: 2026-09-19
+@status: 🟢 PHASE 3 IMPLEMENTATION | @git_branch: main | @last_update: 2026-09-21
 
 ---
 
@@ -59,7 +59,8 @@ terminal-image-paste/
 | **Configuration Manager** | `lib/config.sh` | Đọc / ghi file cấu hình `~/.config/tip/config.conf`. | 🟢 Done |
 | **Interactive TUI Setup** | `lib/tui.sh` | Hiển thị bảng setting tương tác cho người dùng tùy chọn format và phím tắt. | 🟢 Done |
 | **Shortcut Manager** | `lib/shortcut.sh` | Nhận diện DE/Compositor (Niri, GNOME, KDE, Hyprland...) và bind phím tắt toàn cục. | 🟢 Done |
-| **One-Line Installer** | `install.sh` | Kiểm tra dependencies của distro (apt/dnf/pacman), copy binary và chạy wizard thiết lập ban đầu. | 🟡 Planning |
+| **One-Line Installer** | `install.sh` | Tự động nhận diện distro (Arch/Ubuntu/Fedora), cài đặt dependencies và binary. | 🟢 Done |
+| **AUR Package** | `aur/PKGBUILD` | Đặc tả đóng gói phát hành lên Arch User Repository (`terminal-image-paste-git`). | 🟢 Done |
 
 ---
 
@@ -78,6 +79,12 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
+- **2026-09-21 (Phiên 3 - AUR Packaging, Multi-distro Installer & Electron Fix):**
+  - Xử lý dứt điểm lỗi scancode bàn phím ảo của `wtype` trên Chromium/Electron (Antigravity IDE/VS Code): Chuyển sang cơ chế dán tức thì qua Clipboard (`wl-copy` / `xclip`) kết hợp phím dán `Ctrl+Shift+V`.
+  - Bổ sung cơ chế thông minh Smart Fallback: Tự động tái sử dụng `/tmp/clipboard.png` gần nhất khi clipboard không chứa ảnh mới, không bao giờ báo lỗi dừng vô cớ.
+  - Xây dựng trình cài đặt tự động đa distro `install.sh`: Nhận diện `pacman`, `apt`, `dnf`, `zypper`, hỗ trợ cài đặt cả cấp hệ thống (`--system`) và cấp người dùng (`--user`), hỗ trợ gỡ cài đặt (`--uninstall`).
+  - Đóng gói chuẩn Arch Linux AUR trong `aur/PKGBUILD` và sinh tệp siêu dữ liệu `aur/.SRCINFO`.
+  - Cập nhật `bin/tip` phân giải linh hoạt đường dẫn thư viện (`/usr/lib/tip`, `/usr/local/lib/tip`, `~/.local/lib/tip`).
 - **2026-09-20 (Phiên 2 - TUI, Shortcut & GitHub Release):**
   - Hoàn thành triển khai `lib/tui.sh` (Interactive TUI Menu) và `lib/shortcut.sh` (Global Shortcut Manager).
   - Tích hợp bộ giải mã CSI u escape sequences từ Ghostty/Kitty (`tip_decode_csi_u`) và hỗ trợ nhập phím tắt tùy ý.

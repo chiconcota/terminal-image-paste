@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
 # bin/tip - Terminal Image Paste CLI Entrypoint
-# Version 0.1.0
+# Version 1.0.0
 
 set -e
 
-TIP_VERSION="0.1.0"
+TIP_VERSION="1.0.0"
 SOURCE_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
-LIB_DIR="${SOURCE_DIR}/lib"
+
+# Resolve library directory across development, system, and local user installations
+if [[ -d "${SOURCE_DIR}/lib" && -f "${SOURCE_DIR}/lib/logger.sh" ]]; then
+    LIB_DIR="${SOURCE_DIR}/lib"
+elif [[ -d "/usr/lib/tip" && -f "/usr/lib/tip/logger.sh" ]]; then
+    LIB_DIR="/usr/lib/tip"
+elif [[ -d "/usr/local/lib/tip" && -f "/usr/local/lib/tip/logger.sh" ]]; then
+    LIB_DIR="/usr/local/lib/tip"
+elif [[ -d "${HOME}/.local/lib/tip" && -f "${HOME}/.local/lib/tip/logger.sh" ]]; then
+    LIB_DIR="${HOME}/.local/lib/tip"
+elif [[ -d "/usr/share/tip/lib" && -f "/usr/share/tip/lib/logger.sh" ]]; then
+    LIB_DIR="/usr/share/tip/lib"
+else
+    echo "Error: Cannot locate tip library directory." >&2
+    exit 1
+fi
 
 # Load modules
 # shellcheck source=lib/logger.sh
