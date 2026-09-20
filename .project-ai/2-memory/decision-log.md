@@ -15,6 +15,27 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-20 - 🟢 Quốc tế hóa tiếng Anh & Phát hành chính thức lên GitHub
+- **Bối cảnh:** Dự án cần sẵn sàng cho cộng đồng mã nguồn mở quốc tế sử dụng.
+- **Quyết định:**
+  1. Chuyển toàn bộ CLI output, TUI menu, Doctor diagnostics, error messages và log sang tiếng Anh chuẩn.
+  2. Tạo `README.md` (hướng dẫn chi tiết, bảng lệnh, phím tắt), `LICENSE` (MIT) và `.gitignore`.
+  3. Khởi tạo remote và đẩy toàn bộ nhánh `main` lên GitHub: `https://github.com/chiconcota/terminal-image-paste`.
+
+### 2026-09-20 - 🟢 Chế độ Zero-RAM Bloat & Tinh gọn thuần Terminal
+- **Bối cảnh:** Thư mục `/tmp` trên Linux là `tmpfs` (nằm trên RAM). Nếu sinh nhiều file timestamp sẽ gây chiếm dụng RAM. Đồng thời người dùng chỉ cần thao tác trên Terminal, không cần Markdown cho Obsidian.
+- **Quyết định:**
+  1. Đặt mặc định `FILENAME_FORMAT="static"`, mọi ảnh trích xuất đều lưu đè vào duy nhất `/tmp/clipboard.png`. Đảm bảo mức chiếm dụng RAM vĩnh viễn không vượt quá 2MB.
+  2. Loại bỏ tùy chọn `markdown` khỏi `lib/formatter.sh` và bảng TUI, tập trung 100% vào trải nghiệm dòng lệnh (`timg`, `path`, `custom`).
+
+### 2026-09-20 - 🟢 Triển khai TUI Interactive Setup & Shortcut Manager
+- **Bối cảnh:** Cần giao diện trực quan cho người dùng cấu hình mà không cần sửa file bằng tay, hỗ trợ tự động bind phím vào Niri.
+- **Quyết định:**
+  1. Xây dựng `lib/tui.sh` thuần Bash & ANSI escape codes, không phụ thuộc thư viện ngoài.
+  2. Tích hợp `tip_decode_csi_u` để giải mã escape sequences từ Ghostty/Kitty (ví dụ: `^[[98;5u` -> `Ctrl+B`), đồng thời hướng dẫn rõ ràng về việc gõ phím `Super`.
+  3. Xây dựng `lib/shortcut.sh` dùng `awk` để chèn phím tắt an toàn vào đúng khối `binds` toàn cục của Niri (`~/.config/niri/config.kdl`).
+  4. Đổi phím tắt mặc định sang `<Ctrl><Super>v` để tránh xung đột với clipboard history manager.
+
 ### 2026-09-20 - 🟢 Triển khai hoàn thiện Core Engine & CLI Pipeline (Phase 1)
 - **Bối cảnh & Quyết định:**
   1. Khởi tạo kho lưu trữ Git cục bộ trên nhánh `main`.

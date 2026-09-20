@@ -28,7 +28,7 @@
 - `tip_clipboard_extract()`: Trích xuất ảnh từ clipboard, lưu vào file và in đường dẫn ra stdout. Trả về mã `0` khi thành công, `1` khi thất bại.
 
 ### `lib/formatter.sh`
-- `tip_format_output(file_path)`: Định dạng đường dẫn theo `PASTE_FORMAT`.
+- `tip_format_output(file_path)`: Định dạng đường dẫn theo `PASTE_FORMAT` (`timg`, `path`, `custom`).
 - `tip_should_auto_enter()`: Trả về `0` nếu cấu hình `AUTO_ENTER="true"` và format là `timg` hoặc `custom`.
 
 ### `lib/injector.sh`
@@ -36,6 +36,15 @@
 
 ### `lib/doctor.sh`
 - `tip_run_doctor()`: Chẩn đoán môi trường hệ điều hành, display server, compositors, dependencies, và quyền thư mục.
+
+### `lib/tui.sh`
+- `tip_tui_main_menu()`: Bảng điều khiển tương tác TUI (chọn format, auto-enter, hotkey, log level, doctor, log).
+- `tip_tui_select_format()`, `tip_tui_toggle_auto_enter()`, `tip_tui_select_log_level()`, `tip_tui_select_hotkey()`.
+
+### `lib/shortcut.sh`
+- `tip_decode_csi_u(input)`: Giải mã chuỗi escape CSI u từ Ghostty/Kitty (ví dụ: `^[[98;5u` -> `Ctrl+B`).
+- `tip_shortcut_to_niri(raw)`: Chuẩn hóa tổ hợp phím sang định dạng Niri (`Ctrl+Super+V`, `Super+Ctrl+B`...).
+- `tip_shortcut_install(hotkey)`: Tự động ghi phím tắt vào khối `binds` toàn cục của Niri (`~/.config/niri/config.kdl`).
 
 ---
 
@@ -49,11 +58,11 @@
   (Check MIME: image/png...)
                  │
                  ▼
-      Lưu file vào /tmp/clip_YYYYMMDD_HHMMSS.png
+  Lưu đè file vào /tmp/clipboard.png (Zero-RAM Bloat)
                  │
                  ▼
       [lib/formatter.sh]
-    (Format: timg <path> / path / markdown)
+    (Format: timg <path> / path / custom)
                  │
                  ▼
       [lib/injector.sh]

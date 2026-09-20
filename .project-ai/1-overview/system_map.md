@@ -57,28 +57,35 @@ terminal-image-paste/
 | **Logger** | `lib/logger.sh` | Ghi log vào `~/.local/state/tip/tip.log`, xoay vòng tối đa 500 dòng, hiển thị khi chạy `tip log`. | 🟢 Done |
 | **System Doctor** | `lib/doctor.sh` | Kiểm tra dependencies, display server, permissions, phím tắt và in bảng chẩn đoán màu sắc. | 🟢 Done |
 | **Configuration Manager** | `lib/config.sh` | Đọc / ghi file cấu hình `~/.config/tip/config.conf`. | 🟢 Done |
-| **Interactive TUI Setup** | `lib/tui.sh` | Hiển thị bảng setting tương tác cho người dùng tùy chọn format và phím tắt. | 🟡 Planning |
-| **Shortcut Manager** | `lib/shortcut.sh` | Nhận diện DE/Compositor (Niri, GNOME, KDE, Hyprland...) và bind phím tắt toàn cục. | 🟡 Planning |
+| **Interactive TUI Setup** | `lib/tui.sh` | Hiển thị bảng setting tương tác cho người dùng tùy chọn format và phím tắt. | 🟢 Done |
+| **Shortcut Manager** | `lib/shortcut.sh` | Nhận diện DE/Compositor (Niri, GNOME, KDE, Hyprland...) và bind phím tắt toàn cục. | 🟢 Done |
 | **One-Line Installer** | `install.sh` | Kiểm tra dependencies của distro (apt/dnf/pacman), copy binary và chạy wizard thiết lập ban đầu. | 🟡 Planning |
 
 ---
 
 ## 4. BẢNG CẤU HÌNH MẪU (`~/.config/tip/config.conf`)
 ```ini
-# Terminal Image Paste Configuration
-PASTE_FORMAT="timg"                  # path | timg | markdown | custom
-AUTO_ENTER="true"                    # true | false (áp dụng khi dùng lệnh timg/custom)
-CUSTOM_PREFIX="timg"                 # Lệnh tùy chỉnh (ví dụ: chafa, viu, catimg)
+# Terminal Image Paste Configuration (tip)
+PASTE_FORMAT="timg"                  # timg | path | custom
+AUTO_ENTER="true"                    # true | false
+CUSTOM_PREFIX="timg"                 # chafa | viu | catimg
 STORAGE_DIR="/tmp"                   # Thư mục lưu ảnh tạm
-HOTKEY="<Super><Shift>v"             # Tổ hợp phím toàn cục
-FILENAME_FORMAT="timestamp"          # timestamp (clip_20260919_123456.png) | hash | static (clipboard.png)
+HOTKEY="<Ctrl><Super>v"              # Tổ hợp phím toàn cục
+FILENAME_FORMAT="static"             # static (clipboard.png) | timestamp | hash
 LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ```
 
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
-- **2026-09-20:**
+- **2026-09-20 (Phiên 2 - TUI, Shortcut & GitHub Release):**
+  - Hoàn thành triển khai `lib/tui.sh` (Interactive TUI Menu) và `lib/shortcut.sh` (Global Shortcut Manager).
+  - Tích hợp bộ giải mã CSI u escape sequences từ Ghostty/Kitty (`tip_decode_csi_u`) và hỗ trợ nhập phím tắt tùy ý.
+  - Sửa lỗi vị trí khối binds trong Niri (`~/.config/niri/config.kdl`), đưa vào khối `binds` toàn cục chuẩn xác.
+  - Thiết lập chế độ **Zero-RAM Bloat** (`FILENAME_FORMAT="static"`), luôn lưu đè vào `/tmp/clipboard.png`, loại bỏ tùy chọn markdown.
+  - Quốc tế hóa toàn bộ mã nguồn sang tiếng Anh 100%.
+  - Tạo `README.md`, `LICENSE` (MIT), `.gitignore` và phát hành lên GitHub: [https://github.com/chiconcota/terminal-image-paste](https://github.com/chiconcota/terminal-image-paste).
+- **2026-09-20 (Phiên 1 - Core Engine):**
   - Hoàn thành triển khai và kiểm thử 100% Phase 1 (Core Engine & CLI Pipeline): `bin/tip`, `lib/logger.sh`, `lib/config.sh`, `lib/clipboard.sh`, `lib/formatter.sh`, `lib/injector.sh`, `lib/doctor.sh`.
   - Khởi tạo kho lưu trữ Git trên nhánh `main`.
 - **2026-09-19:** 
