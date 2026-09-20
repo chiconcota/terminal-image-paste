@@ -25,14 +25,17 @@
 
 ### `lib/clipboard.sh`
 - `tip_detect_display_server()`: Trả về `"wayland"`, `"x11"`, hoặc `"unknown"`.
-- `tip_clipboard_extract()`: Trích xuất ảnh từ clipboard, lưu vào file và in đường dẫn ra stdout. Trả về mã `0` khi thành công, `1` khi thất bại.
+- `tip_clipboard_extract()`: Trích xuất ảnh từ clipboard sang `$STORAGE_DIR`. Nếu clipboard không chứa ảnh mới, tự động kích hoạt `_tip_find_existing_image()` để tái sử dụng ảnh chụp gần nhất (Smart Fallback).
+- `_tip_find_existing_image(target_file, target_dir)`: Kiểm tra file tồn tại hoặc tìm ảnh gần nhất (`clip_*.png`, `clipboard.png`) để tái sử dụng.
 
 ### `lib/formatter.sh`
 - `tip_format_output(file_path)`: Định dạng đường dẫn theo `PASTE_FORMAT` (`timg`, `path`, `custom`).
 - `tip_should_auto_enter()`: Trả về `0` nếu cấu hình `AUTO_ENTER="true"` và format là `timg` hoặc `custom`.
 
 ### `lib/injector.sh`
-- `tip_inject_text(text, auto_enter)`: Mô phỏng gõ chuỗi vào cửa sổ terminal active thông qua `wtype` (Wayland) hoặc `xdotool` (X11). Fallback in ra stdout nếu thiếu công cụ.
+- `tip_inject_text(text, auto_enter)`: Dán chuỗi vào terminal active:
+  - **Preferred:** Clipboard Injection qua `wl-copy` (cả Clipboard & Primary) / `xclip` rồi gửi phím `Ctrl+Shift+V` kèm độ trễ `0.1s` nhả phím tắt (tức thì 0ms, miễn nhiễm lỗi scancode Chromium/Electron và không xung đột tiếng Việt).
+  - **Fallback:** Gõ phím ảo qua `wtype -p Escape` / `xdotool` hoặc in ra `stdout`.
 
 ### `lib/doctor.sh`
 - `tip_run_doctor()`: Chẩn đoán môi trường hệ điều hành, display server, compositors, dependencies, và quyền thư mục.

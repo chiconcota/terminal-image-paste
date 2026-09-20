@@ -10,8 +10,9 @@
 - Quốc tế hóa 100% tiếng Anh, tạo `README.md`, `LICENSE`, `.gitignore` và phát hành lên GitHub.
 
 ## 2. ROADMAP TIẾP THEO (PHASE 3 - AUR & MULTI-DISTRO TESTING)
-- [ ] Tạo PKGBUILD để đóng gói phát hành lên Arch User Repository (AUR).
-- [ ] Viết script cài đặt tự động `install.sh` hỗ trợ phát hiện package manager (`pacman`, `apt`, `dnf`).
-- [ ] Kiểm thử tính tương thích trên các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
-- [ ] Kiểm thử các Window Manager khác: Hyprland, Sway, GNOME, KDE.
+- [x] Tạo PKGBUILD và .SRCINFO để đóng gói phát hành lên Arch User Repository (AUR) -> Đã phát hành `terminal-image-paste-git`.
+- [x] Viết script cài đặt tự động `install.sh` hỗ trợ phát hiện package manager (`pacman`, `apt`, `dnf`, `zypper`).
+- [x] Sửa lỗi Chromium/Electron scancode collision & bổ sung Smart Fallback tái sử dụng ảnh.
+- [ ] Kiểm thử runtime thực tế trên các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
+- [ ] Mở rộng tự động bind phím cho các Window Manager khác: Hyprland, Sway, GNOME, KDE.
 
