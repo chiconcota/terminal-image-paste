@@ -23,3 +23,12 @@
 ### MISTAKE-004: Trả về non-zero trong hàm chẩn đoán khi bật `set -e`
 - Lỗi: Hàm kiểm tra tùy chọn trả về mã lỗi 2 khiến script bash có `set -e` ngắt tiến trình đột ngột.
 - Sửa đổi: Các hàm kiểm tra/chẩn đoán tùy chọn phải luôn trả về 0 hoặc bọc `|| true` để không phá vỡ cờ `set -e`.
+
+### MISTAKE-005: Xung đột ký tự phân cách của `sed` với đường dẫn file
+- Lỗi: Dùng `sed -i "s/.../.../"` khi chuỗi thay thế chứa đường dẫn `/mnt/Data/...` gây lỗi cú pháp `unknown option to 's'`.
+- Sửa đổi: Khi chèn/thay thế chuỗi có đường dẫn hoặc ký tự đặc biệt, ưu tiên sử dụng `awk -v line="..."` để truyền biến an toàn tuyệt đối.
+
+### MISTAKE-006: Khớp nhầm khối cấu hình con (Nested Block)
+- Lỗi: Dùng regex tìm kiếm `binds {` không neo ở đầu dòng (`^`) khiến script chèn nhầm vào khối con `recent-windows { binds { ... } }` của Niri.
+- Sửa đổi: Khi thao tác với file cấu hình phân cấp, luôn neo regex ở cấp ngoài cùng (`^block_name\s*\{`) để tránh chèn sai block.
+
