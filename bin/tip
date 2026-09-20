@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# bin/tip - Terminal Image Paste CLI Entrypoint
+# Version 0.1.0
+
+set -e
+
+TIP_VERSION="0.1.0"
+SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+LIB_DIR="${SOURCE_DIR}/lib"
+
+# Load modules
+# shellcheck source=lib/logger.sh
+source "${LIB_DIR}/logger.sh"
+# shellcheck source=lib/config.sh
+source "${LIB_DIR}/config.sh"
+# shellcheck source=lib/clipboard.sh
+source "${LIB_DIR}/clipboard.sh"
+# shellcheck source=lib/formatter.sh
+source "${LIB_DIR}/formatter.sh"
+# shellcheck source=lib/injector.sh
+source "${LIB_DIR}/injector.sh"
+# shellcheck source=lib/doctor.sh
+source "${LIB_DIR}/doctor.sh"
+
+tip_help() {
+    cat <<EOF
+Terminal Image Paste (tip) - v${TIP_VERSION}
+Dán ảnh từ clipboard vào terminal nhanh chóng trên Linux (Wayland / X11).
+
+Cú pháp:
+  tip <command> [options]
+
+Các lệnh chính:
+  paste             Trích xuất ảnh từ clipboard, định dạng và gõ vào terminal
+  doctor            Kiểm tra và chẩn đoán môi trường hệ thống
+  log [-f] [-n N]   Xem nhật ký hoạt động (mặc định 30 dòng gần nhất, -f xem realtime)
+  config [show|path|edit]
+                    Xem hoặc chỉnh sửa file cấu hình
+  status            Xem tóm tắt cấu hình và môi trường hiện tại
+  version           Hiển thị phiên bản
+  help              Hiển thị hướng dẫn này
+
+EOF
+}
+
+cmd_paste() {
+    tip_log_info "Bắt đầu thực hiện lệnh tip paste..."
+    local img_path
+    if ! img_path=$(tip_clipboard_extract); then
+        exit 1
+    fi
+
+    local formatted_text
+    formatted_text=$(tip_format_output "$img_path")
+
+    local auto_enter="false"
+    if tip_should_auto_enter; then
+        auto_enter="true"
+    fi
+
+    tip_inject_text "$formatted_text" "$auto_enter"
+}
+
+cmd_status() {
+    local display_server
+    display_server=$(tip_detect_display_server)
+    echo "Terminal Image Paste (tip) - v${TIP_VERSION}"
+    echo "----------------------------------------"
+    printf "%-18s: %s\n" "Display Server" "$display_server"
+    printf "%-18s: %s\n" "Paste Format"   "${PASTE_FORMAT:-timg}"
+    printf "%-18s: %s\n" "Auto Enter"     "${AUTO_ENTER:-false}"
+    printf "%-18s: %s\n" "Storage Dir"    "${STORAGE_DIR:-/tmp}"
+    printf "%-18s: %s\n" "Log File"       "$TIP_LOG_FILE"
+    printf "%-18s: %s\n" "Config File"    "$TIP_CONFIG_FILE"
+}
+
+cmd_config() {
+    local subcmd="${1:-show}"
+    case "$subcmd" in
+        path)
+            echo "$TIP_CONFIG_FILE"
+            ;;
+        edit)
+            local editor="${EDITOR:-nano}"
+            "$editor" "$TIP_CONFIG_FILE"
+            ;;
+        show|*)
+            tip_config_show
+            ;;
+    esac
+}
+
+main() {
+    tip_config_load
+
+    local cmd="${1:-help}"
+    shift || true
+
+    case "$cmd" in
+        paste)
+            cmd_paste "$@"
+            ;;
+        log)
+            tip_show_logs "$@"
+            ;;
+        doctor)
+            tip_run_doctor "$@"
+            ;;
+        config)
+            cmd_config "$@"
+            ;;
+        status)
+            cmd_status "$@"
+            ;;
+        version|-v|--version)
+            echo "tip version ${TIP_VERSION}"
+            ;;
+        help|-h|--help)
+            tip_help
+            ;;
+        *)
+            echo "Lệnh không hợp lệ: $cmd" >&2
+            echo "Chạy 'tip help' để xem danh sách lệnh." >&2
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
