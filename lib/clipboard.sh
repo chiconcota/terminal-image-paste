@@ -73,13 +73,13 @@ tip_clipboard_extract() {
         local mime
         mime=$(_tip_get_image_mime_wayland)
         if [[ -z "$mime" ]]; then
-            tip_log_warn "Không tìm thấy dữ liệu ảnh trong Wayland clipboard."
-            echo "Lỗi: Clipboard không chứa dữ liệu hình ảnh (hoặc thiếu wl-paste)." >&2
+            tip_log_warn "No image data found in Wayland clipboard."
+            echo "Error: Clipboard does not contain image data (or wl-paste is missing)." >&2
             return 1
         fi
 
         if wl-paste --type "$mime" > "$target_file" 2>/dev/null && [[ -s "$target_file" ]]; then
-            tip_log_info "Trích xuất ảnh thành công (Wayland): $target_file [MIME: $mime]"
+            tip_log_info "Successfully extracted image (Wayland): $target_file [MIME: $mime]"
             echo "$target_file"
             return 0
         fi
@@ -87,24 +87,24 @@ tip_clipboard_extract() {
         local mime
         mime=$(_tip_get_image_mime_x11)
         if [[ -z "$mime" ]]; then
-            tip_log_warn "Không tìm thấy dữ liệu ảnh trong X11 clipboard."
-            echo "Lỗi: Clipboard không chứa dữ liệu hình ảnh (hoặc thiếu xclip)." >&2
+            tip_log_warn "No image data found in X11 clipboard."
+            echo "Error: Clipboard does not contain image data (or xclip is missing)." >&2
             return 1
         fi
 
         if xclip -selection clipboard -t "$mime" -o > "$target_file" 2>/dev/null && [[ -s "$target_file" ]]; then
-            tip_log_info "Trích xuất ảnh thành công (X11): $target_file [MIME: $mime]"
+            tip_log_info "Successfully extracted image (X11): $target_file [MIME: $mime]"
             echo "$target_file"
             return 0
         fi
     else
-        tip_log_error "Không thể nhận diện Display Server (Wayland hoặc X11)."
-        echo "Lỗi: Môi trường không có WAYLAND_DISPLAY hoặc DISPLAY." >&2
+        tip_log_error "Unable to detect display server (neither Wayland nor X11)."
+        echo "Error: Unsupported environment (Wayland or X11 required)." >&2
         return 1
     fi
 
     rm -f "$target_file" 2>/dev/null || true
-    tip_log_error "Thất bại khi ghi dữ liệu ảnh ra $target_file."
-    echo "Lỗi: Không thể trích xuất dữ liệu ảnh ra file." >&2
+    tip_log_error "Failed to write image file to: $target_file"
+    echo "Error: Failed to extract or save image from clipboard." >&2
     return 1
 }

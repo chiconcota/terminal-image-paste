@@ -48,16 +48,16 @@ tip_inject_text() {
 
     if [[ "$display_server" == "wayland" ]]; then
         if _tip_inject_wayland "$text" "$auto_enter"; then
-            tip_log_info "Đã inject text vào terminal active (Wayland)."
+            tip_log_info "Injected text into active terminal (Wayland)."
             return 0
         fi
-        tip_log_warn "Không tìm thấy wtype hoặc ydotool trên Wayland. Fallback xuất stdout."
+        tip_log_warn "Neither wtype nor ydotool found on Wayland. Falling back to stdout."
     elif [[ "$display_server" == "x11" ]]; then
         if _tip_inject_x11 "$text" "$auto_enter"; then
-            tip_log_info "Đã inject text vào terminal active (X11)."
+            tip_log_info "Injected text into active terminal (X11)."
             return 0
         fi
-        tip_log_warn "Không tìm thấy xdotool trên X11. Fallback xuất stdout."
+        tip_log_warn "xdotool not found on X11. Falling back to stdout."
     fi
 
     # Fallback khi thiếu công cụ gõ phím

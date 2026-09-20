@@ -84,7 +84,7 @@ tip_show_logs() {
     done
 
     if [[ ! -f "$TIP_LOG_FILE" ]]; then
-        echo "Chưa có file nhật ký ($TIP_LOG_FILE)."
+        echo "No log file found ($TIP_LOG_FILE)."
         return 0
     fi
 

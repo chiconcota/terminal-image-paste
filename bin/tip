@@ -21,30 +21,58 @@ source "${LIB_DIR}/formatter.sh"
 source "${LIB_DIR}/injector.sh"
 # shellcheck source=lib/doctor.sh
 source "${LIB_DIR}/doctor.sh"
+# shellcheck source=lib/tui.sh
+source "${LIB_DIR}/tui.sh"
+# shellcheck source=lib/shortcut.sh
+source "${LIB_DIR}/shortcut.sh"
 
 tip_help() {
-    cat <<EOF
-Terminal Image Paste (tip) - v${TIP_VERSION}
-Dán ảnh từ clipboard vào terminal nhanh chóng trên Linux (Wayland / X11).
+    local C_RESET="\033[0m"
+    local C_BOLD="\033[1m"
+    local C_CYAN="\033[36m"
+    local C_GREEN="\033[32m"
+    local C_YELLOW="\033[33m"
+    local C_DIM="\033[2m"
 
-Cú pháp:
-  tip <command> [options]
-
-Các lệnh chính:
-  paste             Trích xuất ảnh từ clipboard, định dạng và gõ vào terminal
-  doctor            Kiểm tra và chẩn đoán môi trường hệ thống
-  log [-f] [-n N]   Xem nhật ký hoạt động (mặc định 30 dòng gần nhất, -f xem realtime)
-  config [show|path|edit]
-                    Xem hoặc chỉnh sửa file cấu hình
-  status            Xem tóm tắt cấu hình và môi trường hiện tại
-  version           Hiển thị phiên bản
-  help              Hiển thị hướng dẫn này
-
-EOF
+    echo -e "${C_CYAN}${C_BOLD}Terminal Image Paste (tip) - v${TIP_VERSION}${C_RESET}"
+    echo -e "${C_DIM}Quickly paste images from clipboard into terminal on Linux (Wayland / X11)${C_RESET}"
+    echo ""
+    echo -e "${C_YELLOW}${C_BOLD}USAGE:${C_RESET}"
+    echo -e "  tip [command] [options]"
+    echo -e "  tip config                ${C_DIM}(Open interactive TUI configuration menu)${C_RESET}"
+    echo ""
+    echo -e "${C_GREEN}${C_BOLD}QUICK START:${C_RESET}"
+    echo -e "  1. ${C_CYAN}tip doctor${C_RESET}       Check system dependencies and environment"
+    echo -e "  2. ${C_CYAN}tip config${C_RESET}       Open TUI menu to select paste format (timg, path, custom...)"
+    echo -e "  3. ${C_CYAN}tip paste${C_RESET}        Paste image directly from clipboard into active terminal"
+    echo ""
+    echo -e "${C_YELLOW}${C_BOLD}COMMANDS:${C_RESET}"
+    echo -e "  ${C_BOLD}Core Actions:${C_RESET}"
+    echo -e "    ${C_CYAN}paste${C_RESET}             Extract clipboard image, format, and type into terminal"
+    echo -e "    ${C_CYAN}status${C_RESET}            Show current configuration and environment summary"
+    echo ""
+    echo -e "  ${C_BOLD}Configuration & TUI:${C_RESET}"
+    echo -e "    ${C_CYAN}config${C_RESET}            Open interactive TUI menu for configuration"
+    echo -e "    ${C_CYAN}config show${C_RESET}       Print current configuration file (~/.config/tip/config.conf)"
+    echo -e "    ${C_CYAN}config edit${C_RESET}       Open configuration file in editor"
+    echo -e "    ${C_CYAN}config path${C_RESET}       Print configuration file path"
+    echo -e "    ${C_CYAN}config set <k> <v>${C_RESET} Set configuration property from CLI"
+    echo -e "    ${C_CYAN}shortcut [key]${C_RESET}    Automatically register desktop shortcut (Niri)"
+    echo ""
+    echo -e "  ${C_BOLD}Diagnostics & Logs:${C_RESET}"
+    echo -e "    ${C_CYAN}doctor${C_RESET}            Run system and dependency diagnostics"
+    echo -e "    ${C_CYAN}log [-f] [-n N]${C_RESET}   View activity logs (-f to follow realtime, default 30 lines)"
+    echo ""
+    echo -e "  ${C_BOLD}Help & Version:${C_RESET}"
+    echo -e "    ${C_CYAN}help, -h, --help${C_RESET}  Display this help screen"
+    echo -e "    ${C_CYAN}version, -v${C_RESET}       Display current version"
+    echo ""
+    echo -e "${C_DIM}Default global shortcut: ${C_YELLOW}<Ctrl><Super>v${C_RESET}"
+    echo ""
 }
 
 cmd_paste() {
-    tip_log_info "Bắt đầu thực hiện lệnh tip paste..."
+    tip_log_info "Executing tip paste command..."
     local img_path
     if ! img_path=$(tip_clipboard_extract); then
         exit 1
@@ -75,8 +103,19 @@ cmd_status() {
 }
 
 cmd_config() {
-    local subcmd="${1:-show}"
+    local subcmd="${1:-tui}"
     case "$subcmd" in
+        tui)
+            tip_tui_main_menu
+            ;;
+        set)
+            if [[ -z "$2" ]]; then
+                echo "Usage: tip config set <KEY> <VALUE>" >&2
+                return 1
+            fi
+            tip_config_set "$2" "$3"
+            echo "Updated: $2=\"$3\""
+            ;;
         path)
             echo "$TIP_CONFIG_FILE"
             ;;
@@ -84,8 +123,13 @@ cmd_config() {
             local editor="${EDITOR:-nano}"
             "$editor" "$TIP_CONFIG_FILE"
             ;;
-        show|*)
+        show)
             tip_config_show
+            ;;
+        *)
+            echo "Invalid config option: $subcmd" >&2
+            echo "Run 'tip config' to open TUI or 'tip help' for usage." >&2
+            exit 1
             ;;
     esac
 }
@@ -109,6 +153,9 @@ main() {
         config)
             cmd_config "$@"
             ;;
+        shortcut)
+            tip_shortcut_install "$@"
+            ;;
         status)
             cmd_status "$@"
             ;;
@@ -119,8 +166,8 @@ main() {
             tip_help
             ;;
         *)
-            echo "Lệnh không hợp lệ: $cmd" >&2
-            echo "Chạy 'tip help' để xem danh sách lệnh." >&2
+            echo "Invalid command: $cmd" >&2
+            echo "Run 'tip help' to view available commands." >&2
             exit 1
             ;;
     esac

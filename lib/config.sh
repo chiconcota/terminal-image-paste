@@ -10,8 +10,8 @@ tip_config_defaults() {
     AUTO_ENTER="true"
     CUSTOM_PREFIX="timg"
     STORAGE_DIR="/tmp"
-    HOTKEY="<Super><Shift>v"
-    FILENAME_FORMAT="timestamp"
+    HOTKEY="<Ctrl><Super>v"
+    FILENAME_FORMAT="static"
     LOG_LEVEL="INFO"
 }
 
@@ -23,25 +23,25 @@ tip_config_init() {
     if [[ ! -f "$TIP_CONFIG_FILE" ]]; then
         cat <<'EOF' > "$TIP_CONFIG_FILE"
 # Terminal Image Paste Configuration (tip)
-# Định dạng dán: path | timg | markdown | custom
+# Paste format: timg | path | custom
 PASTE_FORMAT="timg"
 
-# Tự động gõ Enter sau khi dán lệnh (true | false)
+# Automatically press Enter after pasting command (true | false)
 AUTO_ENTER="true"
 
-# Lệnh tùy chỉnh khi PASTE_FORMAT="custom" (ví dụ: chafa, viu, catimg)
+# Custom command prefix when PASTE_FORMAT="custom" (e.g. chafa, viu, catimg)
 CUSTOM_PREFIX="timg"
 
-# Thư mục lưu ảnh tạm thời
+# Temporary image storage directory
 STORAGE_DIR="/tmp"
 
-# Tổ hợp phím toàn cục (tham khảo khi cài đặt shortcut)
-HOTKEY="<Super><Shift>v"
+# Global shortcut (used for desktop keybinding)
+HOTKEY="<Ctrl><Super>v"
 
-# Quy tắc đặt tên file: timestamp | hash | static
-FILENAME_FORMAT="timestamp"
+# Filename pattern: static (clipboard.png) | timestamp | hash
+FILENAME_FORMAT="static"
 
-# Mức độ ghi log: DEBUG | INFO | WARN | ERROR
+# Log level: DEBUG | INFO | WARN | ERROR
 LOG_LEVEL="INFO"
 EOF
     fi
@@ -52,13 +52,13 @@ tip_config_load() {
     tip_config_init
 
     if [[ -f "$TIP_CONFIG_FILE" ]]; then
-        # Nạp cấu hình an toàn bằng cách đọc từng cặp KEY="VALUE"
+        # Safely read configuration by parsing KEY="VALUE" pairs
         while IFS='=' read -r key val || [[ -n "$key" ]]; do
-            # Bỏ qua comment và dòng trống
+            # Skip comments and empty lines
             [[ "$key" =~ ^[[:space:]]*# ]] && continue
             [[ -z "${key// }" ]] && continue
 
-            # Xóa khoảng trắng thừa và quotes
+            # Strip whitespace and quotes
             key=$(echo "$key" | tr -d '[:space:]')
             val=$(echo "$val" | sed -e 's/^[[:space:]]*"//' -e 's/"[[:space:]]*$//' -e "s/^[[:space:]]*'//" -e "s/'[[:space:]]*$//")
 
@@ -74,20 +74,42 @@ tip_config_load() {
         done < "$TIP_CONFIG_FILE"
     fi
 
-    # Đảm bảo thư mục lưu trữ tồn tại
+    # Ensure storage directory exists
     if [[ ! -d "$STORAGE_DIR" ]]; then
         mkdir -p "$STORAGE_DIR" 2>/dev/null || STORAGE_DIR="/tmp"
     fi
 }
 
 tip_config_show() {
-    echo "Đường dẫn file cấu hình: $TIP_CONFIG_FILE"
+    echo "Configuration file: $TIP_CONFIG_FILE"
     echo "----------------------------------------"
     if [[ -f "$TIP_CONFIG_FILE" ]]; then
         cat "$TIP_CONFIG_FILE"
     else
-        echo "Chưa có file cấu hình. Khởi tạo giá trị mặc định..."
+        echo "No configuration file found. Initializing with defaults..."
         tip_config_init
         cat "$TIP_CONFIG_FILE"
     fi
 }
+
+tip_config_set() {
+    local key="$1"
+    local val="$2"
+
+    if [[ -z "$key" ]]; then
+        echo "Error: Missing configuration key." >&2
+        return 1
+    fi
+
+    tip_config_init
+
+    if grep -q "^[[:space:]]*${key}=" "$TIP_CONFIG_FILE" 2>/dev/null; then
+        sed -i "s|^[[:space:]]*${key}=.*|${key}=\"${val}\"|" "$TIP_CONFIG_FILE"
+    else
+        echo "${key}=\"${val}\"" >> "$TIP_CONFIG_FILE"
+    fi
+
+    # Reload into memory
+    tip_config_load
+}
+

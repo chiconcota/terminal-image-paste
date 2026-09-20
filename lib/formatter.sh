@@ -18,9 +18,6 @@ tip_format_output() {
         timg)
             printf "timg %s" "$file_path"
             ;;
-        markdown)
-            printf "![](%s)" "$file_path"
-            ;;
         custom)
             printf "%s %s" "$custom_cmd" "$file_path"
             ;;
