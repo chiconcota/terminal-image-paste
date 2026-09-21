@@ -12,21 +12,34 @@ _tip_inject_wayland() {
         printf "%s" "$text" | wl-copy --primary 2>/dev/null || true
     fi
 
-    # 1. Preferred (Hyprland): Native sendshortcut dispatcher (zero virtual-keyboard bug, zero scancode collision)
     local de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+    local is_hyprland=false
     if { pgrep -x Hyprland &>/dev/null || [[ "$de" =~ [Hh]yprland ]]; } && command -v hyprctl &>/dev/null; then
+        is_hyprland=true
+    fi
+
+    # 1. Hyprland: Native sendshortcut dispatcher (zero virtual-keyboard bug, zero scancode collision)
+    if $is_hyprland; then
         sleep 0.1
-        if hyprctl dispatch sendshortcut "CTRL SHIFT, V, activewindow" &>/dev/null || hyprctl dispatch sendshortcut "CTRL SHIFT, V" &>/dev/null; then
+        # Try Hyprland 0.55+ syntax ('active'), then classic variations
+        if hyprctl dispatch sendshortcut "CTRL SHIFT, V, active" &>/dev/null || \
+           hyprctl dispatch sendshortcut "CTRL_SHIFT, V, active" &>/dev/null || \
+           hyprctl dispatch sendshortcut "SHIFT, Insert, active" &>/dev/null || \
+           hyprctl dispatch sendshortcut "CTRL, V, active" &>/dev/null || \
+           hyprctl dispatch sendshortcut "CTRL SHIFT, V" &>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 sleep 0.05
-                hyprctl dispatch sendshortcut ", Return, activewindow" &>/dev/null || hyprctl dispatch sendshortcut ", Return" &>/dev/null || true
+                hyprctl dispatch sendshortcut ", Return, active" &>/dev/null || \
+                hyprctl dispatch sendshortcut ", Return" &>/dev/null || true
             fi
             return 0
         fi
-        tip_log_warn "hyprctl sendshortcut failed on Hyprland."
+        tip_log_warn "hyprctl sendshortcut failed on Hyprland. Bypassing wtype to avoid btop keybind collision."
+        # STRICT ISOLATION: Never fall through to wtype on Hyprland (wtype -k v emits scancode 1 KEY_ESC, triggering Ctrl+Shift+Escape -> btop)
+        return 1
     fi
 
-    # 2. Preferred (General Wayland): Clipboard Paste via wtype (Instant 0ms, zero scancode collision)
+    # 2. Preferred (General Wayland - Niri / Sway): Clipboard Paste via wtype (Instant 0ms, zero scancode collision)
     if command -v wl-copy &>/dev/null && command -v wtype &>/dev/null; then
         sleep 0.1
         if wtype -M ctrl -M shift -k v -m shift -m ctrl 2>/dev/null; then
