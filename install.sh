@@ -72,8 +72,15 @@ check_dependencies() {
         if ! command -v wl-copy &>/dev/null || ! command -v wl-paste &>/dev/null; then
             missing_pkgs+=("wl-clipboard")
         fi
-        if ! command -v wtype &>/dev/null; then
-            missing_pkgs+=("wtype")
+        local de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+        if [[ "$de" =~ (KDE|Plasma|GNOME) ]]; then
+            if ! command -v ydotool &>/dev/null; then
+                missing_pkgs+=("ydotool")
+            fi
+        else
+            if ! command -v wtype &>/dev/null; then
+                missing_pkgs+=("wtype")
+            fi
         fi
     else
         if ! command -v xclip &>/dev/null; then

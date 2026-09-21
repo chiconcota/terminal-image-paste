@@ -40,6 +40,10 @@ _tip_doctor_detect_de() {
         echo "Hyprland"
     elif pgrep -x sway &>/dev/null; then
         echo "Sway"
+    elif pgrep -x kwin_wayland &>/dev/null || [[ "$de" =~ [Kk][Dd][Ee]|PLASMA ]]; then
+        echo "KDE Plasma (KWin)"
+    elif pgrep -x gnome-shell &>/dev/null || [[ "$de" =~ [Gg][Nn][Oo][Mm][Ee] ]]; then
+        echo "GNOME (Mutter)"
     elif [[ -n "$de" ]]; then
         echo "$de"
     else
@@ -79,8 +83,28 @@ tip_run_doctor() {
 
     echo -e "\033[1m3. Key Injector Tools (Input Simulation):\033[0m"
     if [[ "$display_server" == "wayland" ]]; then
-        _tip_doctor_check_cmd "wtype"   "Wayland xdotool alternative" "true"
-        _tip_doctor_check_cmd "ydotool" "Wayland generic input simulator" "false"
+        local is_kwin_or_mutter=false
+        if [[ "$de_info" =~ (KDE|Plasma|KWin|GNOME|Mutter) ]]; then
+            is_kwin_or_mutter=true
+        fi
+
+        if $is_kwin_or_mutter; then
+            _tip_doctor_check_cmd "ydotool" "Wayland generic input simulator (Recommended for KDE/GNOME)" "false"
+            if command -v ydotool &>/dev/null; then
+                if pgrep -x ydotoold &>/dev/null; then
+                    printf "  \033[0;32m✔\033[0m %-16s : \033[0;32mRunning\033[0m (Daemon is active)\n" "ydotoold"
+                else
+                    printf "  \033[0;33m!\033[0m %-16s : \033[0;33mNot running\033[0m (Run 'systemctl --user start ydotoold' or 'sudo ydotoold &')\n" "ydotoold"
+                fi
+            fi
+            _tip_doctor_check_cmd "wtype"   "Wayland virtual keyboard (Unsupported on KWin/Mutter)" "false"
+            if command -v wtype &>/dev/null; then
+                printf "  \033[0;33m!\033[0m %-16s : \033[0;33mNotice\033[0m (KWin/Mutter lacks zwp_virtual_keyboard_v1 protocol)\n" "wtype note"
+            fi
+        else
+            _tip_doctor_check_cmd "wtype"   "Wayland virtual keyboard (wlroots / Niri)" "true"
+            _tip_doctor_check_cmd "ydotool" "Wayland generic input simulator" "false"
+        fi
     else
         _tip_doctor_check_cmd "xdotool" "X11 automation tool" "true"
     fi
