@@ -1,9 +1,10 @@
 # CHECKPOINT & PROGRESS HANDOVER (checkpoint.md)
-@status: PHASE 3 (SHORTCUT GUIDE RESOLVED 🟢 -> NEXT: NIRI RUNTIME TEST 🎯) | @git_branch: main | @last_update: 2026-09-22
+@status: PHASE 3 (TAG v1.1.0 PUSHED 🟢 -> NEXT: NIRI RUNTIME TEST 🎯) | @git_branch: main | @last_update: 2026-09-22
 
 ## 1. TRẠNG THÁI HIỆN TẠI (CURRENT STATUS)
 - **Phase 1 & 2:** Hoàn tất 100% (Core Engine, TUI Setup, Localization, GitHub Release).
 - **Phase 3 (Tiến độ mới nhất trong phiên 7):**
+  - **Nâng cấp phiên bản v1.1.0:** Đã cập nhật SemVer lên `1.1.0` (`bin/tip`, `aur/PKGBUILD`, `aur/.SRCINFO`), commit, tạo tag `v1.1.0` và push lên GitHub.
   - **Chuyển đổi toàn diện sang Shortcut Setup Guide:** Loại bỏ hoàn toàn việc tự động can thiệp file config dotfiles (`config.kdl`, KDE, GNOME, Openbox).
   - **Module `lib/shortcut.sh`:** Tái cấu trúc thành công cụ nhận diện môi trường (`tip_detect_wm`) và cung cấp snippet chuẩn xác (Niri, Hyprland, Sway, i3, KDE, GNOME, Openbox).
   - **TUI & CLI:** Cập nhật mục `[3]` trong `tip config` và lệnh CLI `tip shortcut [wm|all]` / `tip guide [wm|all]`.
