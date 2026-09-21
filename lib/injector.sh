@@ -53,10 +53,16 @@ _tip_inject_x11() {
     local text="$1"
     local auto_enter="$2"
 
-    # Preferred: Clipboard Paste
+    # Always copy text to both X11 clipboard and primary selection
+    if command -v xclip &>/dev/null; then
+        printf "%s" "$text" | xclip -selection clipboard 2>/dev/null || true
+        printf "%s" "$text" | xclip -selection primary 2>/dev/null || true
+    fi
+
+    # 1. Preferred: Clipboard Paste via xdotool
+    # Sleep 0.25s ensures Window Managers (Openbox, XFCE, i3) release physical key grab (XUngrabKeyboard)
     if command -v xclip &>/dev/null && command -v xdotool &>/dev/null; then
-        printf "%s" "$text" | xclip -selection clipboard 2>/dev/null
-        sleep 0.05
+        sleep 0.25
         if xdotool key --clearmodifiers ctrl+shift+v 2>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 sleep 0.05
@@ -66,7 +72,9 @@ _tip_inject_x11() {
         fi
     fi
 
+    # 2. Fallback: Direct typing via xdotool
     if command -v xdotool &>/dev/null; then
+        sleep 0.1
         if xdotool type --clearmodifiers --delay 0 "$text" 2>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 xdotool key --clearmodifiers Return 2>/dev/null || true

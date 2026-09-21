@@ -122,6 +122,8 @@ tip_tui_select_hotkey() {
             de_name="GNOME Shortcuts"
         elif pgrep -x "kwin_wayland" &>/dev/null || pgrep -x "kwin_x11" &>/dev/null || [[ "$de" =~ (KDE|Plasma|KWin) ]]; then
             de_name="KDE Plasma Shortcuts"
+        elif pgrep -x "openbox" &>/dev/null || [[ "$de" =~ (LXDE|Openbox|OPENBOX) ]]; then
+            de_name="LXDE / Openbox config"
         elif pgrep -x "niri" &>/dev/null || [[ "$de" =~ [Nn]iri ]]; then
             de_name="Niri config (config.kdl)"
         elif pgrep -x "Hyprland" &>/dev/null || [[ "$de" =~ [Hh]yprland ]]; then

@@ -15,6 +15,18 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-21 - 🟢 Tương thích LXDE (Openbox), Sửa lỗi Key Grab X11 & Tự động gán Phím tắt
+- **Bối cảnh:**
+  1. Khi kiểm thử trên CachyOS LXDE (X11), phím tắt toàn cục trong `lxhotkey` gọi `tip paste` nhưng terminal không dán được.
+  2. Nguyên nhân: `sleep 0.05` quá ngắn (50ms). Khi người dùng bấm tổ hợp 3 phím (`Shift+Super+V`), Openbox kích hoạt `XGrabKeyboard` chiếm toàn quyền bàn phím. `xdotool` gửi phím dán khi người dùng chưa kịp nhả tay nên sự kiện bị Openbox nuốt mất.
+  3. `tip config` chưa có adapter tự động đăng ký phím tắt cho môi trường LXDE / Openbox.
+- **Quyết định:**
+  1. **Nâng độ trễ nhả phím X11 (`lib/injector.sh`):** Tăng sleep lên `0.25s` trước khi `xdotool` gửi phím dán `ctrl+shift+v`, đảm bảo Openbox đã nhả key grab. Đồng thời sao chép dữ liệu vào cả `clipboard` và `primary selection` của `xclip`.
+  2. **Adapter phím tắt LXDE / Openbox (`lib/shortcut.sh`):**
+     - Hàm `tip_shortcut_to_openbox()` chuyển đổi hotkey sang chuẩn Openbox XML: `<Super><Shift>v` ➔ `W-S-v`, `<Ctrl><Super>v` ➔ `C-W-v`.
+     - Hàm `tip_shortcut_install_lxde()` chèn/cập nhật thẻ `<keybind>` có comment đánh dấu `<!-- [tip-shortcut] -->` trong `~/.config/openbox/lxde-rc.xml` (hoặc `rc.xml`), kèm lệnh reload tức thì `openbox --reconfigure`.
+  3. **Cập nhật nhận diện TUI & Doctor:** Bổ sung nhận diện `LXDE / Openbox` trong `lib/tui.sh` và `lib/doctor.sh`.
+
 ### 2026-09-21 - 🟢 Tương thích KDE Plasma (KWin) & GNOME (Mutter), Fallback ydotool & Phím tắt Tự động
 - **Bối cảnh:**
   1. Khi kiểm thử trên CachyOS KDE Plasma (Wayland), `wtype` thất bại do KWin không hỗ trợ `zwp_virtual_keyboard_v1`. Tuy nhiên code cũ nuốt mã lỗi (`2>/dev/null`) và `return 0` giả, khiến `tip paste` im lặng kết thúc và fish shell in prompt `~`.

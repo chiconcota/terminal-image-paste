@@ -295,6 +295,110 @@ tip_shortcut_install_gnome() {
     return 0
 }
 
+# Chuyển đổi định dạng hotkey sang cú pháp Openbox XML (ví dụ: <Ctrl><Super>v -> C-W-v, <Super><Shift>v -> W-S-v)
+tip_shortcut_to_openbox() {
+    local raw="$1"
+    raw=$(tip_decode_csi_u "$raw")
+
+    local formatted
+    formatted=$(echo "$raw" | sed -e 's/<//g' -e 's/>/+/g' -e 's/++*/+/g' -e 's/+$//' -e 's/^+//')
+
+    local key_char
+    key_char=$(echo "$formatted" | grep -o '[^+]*$')
+    local mods
+    mods=$(echo "$formatted" | sed -E 's/\+[^+]*$//')
+
+    local ob_mods=""
+    for m in $(echo "$mods" | tr '+' ' '); do
+        case "$m" in
+            [Ss]uper|[Ww]in) ob_mods="${ob_mods}W-" ;;
+            [Cc]trl|[Cc]ontrol) ob_mods="${ob_mods}C-" ;;
+            [Ss]hift) ob_mods="${ob_mods}S-" ;;
+            [Aa]lt) ob_mods="${ob_mods}A-" ;;
+        esac
+    done
+
+    local lower_key
+    lower_key=$(echo "$key_char" | tr '[:upper:]' '[:lower:]')
+    echo "${ob_mods}${lower_key}"
+}
+
+# Cài đặt phím tắt tự động vào Openbox / LXDE (~/.config/openbox/lxde-rc.xml hoặc rc.xml)
+tip_shortcut_install_lxde() {
+    local raw_hotkey="$1"
+    local ob_hotkey
+    ob_hotkey=$(tip_shortcut_to_openbox "$raw_hotkey")
+    if [[ -z "$ob_hotkey" ]]; then
+        echo "Error: Invalid or empty hotkey combination." >&2
+        return 1
+    fi
+
+    local bin_path
+    bin_path="$(which tip 2>/dev/null || echo "$HOME/.local/bin/tip")"
+
+    local ob_dir="${XDG_CONFIG_HOME:-$HOME/.config}/openbox"
+    mkdir -p "$ob_dir"
+    local ob_config="${ob_dir}/lxde-rc.xml"
+    if [[ ! -f "$ob_config" ]]; then
+        if [[ -f "${ob_dir}/rc.xml" ]]; then
+            ob_config="${ob_dir}/rc.xml"
+        elif [[ -f "/etc/xdg/openbox/lxde-rc.xml" ]]; then
+            cp "/etc/xdg/openbox/lxde-rc.xml" "$ob_config" 2>/dev/null || true
+        elif [[ -f "/etc/xdg/openbox/rc.xml" ]]; then
+            cp "/etc/xdg/openbox/rc.xml" "$ob_config" 2>/dev/null || true
+        else
+            cat > "$ob_config" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <keyboard>
+  </keyboard>
+</openbox_config>
+EOF
+        fi
+    fi
+
+    cp "$ob_config" "${ob_config}.bak_tip" 2>/dev/null || true
+
+    if grep -q "<!-- \[tip-shortcut\] -->" "$ob_config" 2>/dev/null; then
+        awk -v hotkey="$ob_hotkey" -v bin_path="$bin_path" '
+            BEGIN { in_tip=0 }
+            /<!-- \[tip-shortcut\] -->/ {
+                in_tip=1
+                print
+                print "    <keybind key=\"" hotkey "\">"
+                print "      <action name=\"Execute\">"
+                print "        <command>" bin_path " paste</command>"
+                print "      </action>"
+                print "    </keybind>"
+                next
+            }
+            in_tip && /<\/keybind>/ { in_tip=0; next }
+            in_tip { next }
+            { print }
+        ' "$ob_config" > "${ob_config}.tmp" && mv "${ob_config}.tmp" "$ob_config"
+    else
+        awk -v hotkey="$ob_hotkey" -v bin_path="$bin_path" '
+            BEGIN { inserted=0 }
+            !inserted && /<keyboard[ >]/ {
+                print
+                print "    <!-- [tip-shortcut] -->"
+                print "    <keybind key=\"" hotkey "\">"
+                print "      <action name=\"Execute\">"
+                print "        <command>" bin_path " paste</command>"
+                print "      </action>"
+                print "    </keybind>"
+                inserted=1
+                next
+            }
+            { print }
+        ' "$ob_config" > "${ob_config}.tmp" && mv "${ob_config}.tmp" "$ob_config"
+    fi
+
+    openbox --reconfigure 2>/dev/null || true
+    echo "Configured shortcut for LXDE (Openbox): ${ob_hotkey}"
+    return 0
+}
+
 # Coordinate shortcut installation by Display Server & Compositor
 tip_shortcut_install() {
     local hotkey="${1:-$HOTKEY}"
@@ -309,6 +413,12 @@ tip_shortcut_install() {
     # Check KDE Plasma
     if pgrep -x "kwin_wayland" >/dev/null 2>&1 || pgrep -x "kwin_x11" >/dev/null 2>&1 || [[ "$compositor" =~ (KDE|Plasma|KWin) ]]; then
         tip_shortcut_install_kde "$hotkey"
+        return $?
+    fi
+
+    # Check LXDE / Openbox
+    if pgrep -x "openbox" >/dev/null 2>&1 || [[ "$compositor" =~ (LXDE|Openbox|OPENBOX) ]] || [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/openbox/lxde-rc.xml" ]]; then
+        tip_shortcut_install_lxde "$hotkey"
         return $?
     fi
 

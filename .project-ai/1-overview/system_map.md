@@ -10,7 +10,7 @@
   - **X11:** `xclip` / `xsel`, `xdotool`.
 - **Desktop Environments (Auto-detect Shortcut):**
   - **Wayland Compositors:** Niri (`config.kdl`), Hyprland / Sway (`config file append`).
-  - **Desktop Environments:** GNOME (`gsettings`), KDE Plasma (`kwriteconfig` / `kglobalaccel`), XFCE (`xfconf-query`), i3.
+  - **Desktop Environments:** GNOME (`gsettings`), KDE Plasma (`kwriteconfig` / `kglobalaccel`), LXDE / Openbox (`lxde-rc.xml` / `rc.xml`), XFCE (`xfconf-query`), i3.
 - **Cấu hình & Nhật ký (XDG Standard):**
   - File cấu hình: `~/.config/tip/config.conf`
   - File nhật ký lỗi/hoạt động: `~/.local/state/tip/tip.log` (tự động xoay vòng tối đa 500 dòng).
@@ -79,7 +79,11 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
-- **2026-09-21 (Phiên 4 - Tương thích KDE Plasma KWin, GNOME Mutter & Phím tắt Tự động):**
+- **2026-09-21 (Phiên 5 - Hỗ trợ LXDE / Openbox & Khắc phục Key Grab X11):**
+  - Khắc phục lỗi nuốt phím tắt trên X11/Openbox: Tăng độ trễ nhả phím lên `0.25s` trong `lib/injector.sh`, sao chép dữ liệu vào cả clipboard và primary selection (`xclip`).
+  - Xây dựng adapter tự động đăng ký phím tắt cho LXDE / Openbox: Tự động chuyển đổi sang cú pháp Openbox XML (`W-S-v`, `C-W-v`), cập nhật `lxde-rc.xml` / `rc.xml` và reload tức thì qua `openbox --reconfigure`.
+  - Cập nhật nhận diện DE trong `lib/tui.sh` và `lib/doctor.sh`.
+- **2026-09-21 (Phiên 4 - Kiểm thử KDE Plasma, ydotool Fallback & Phím tắt KDE/GNOME):**
   - Xử lý lỗi `wtype` không gõ được phím trên KDE Plasma / GNOME Wayland: Bắt mã lỗi exit code, fallback qua `ydotool` hoặc `stdout`, luôn đưa lệnh vào `wl-copy` để dán an toàn.
   - Tự động hóa đăng ký phím tắt cho KDE Plasma (`~/.config/kglobalshortcutsrc` + `tip-paste.desktop` + D-Bus KWin).
   - Tự động hóa đăng ký phím tắt cho GNOME thông qua `gsettings custom-keybindings`.

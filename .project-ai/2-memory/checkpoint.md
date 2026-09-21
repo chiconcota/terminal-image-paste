@@ -1,15 +1,13 @@
 # CHECKPOINT & PROGRESS HANDOVER (checkpoint.md)
-@status: PHASE 3 (KDE TESTED 🟢 -> NEXT: GNOME TESTING 🎯) | @git_branch: main | @last_update: 2026-09-21
+@status: PHASE 3 (KDE & LXDE TESTED 🟢 -> NEXT: GNOME TESTING 🎯) | @git_branch: main | @last_update: 2026-09-21
 
 ## 1. TRẠNG THÁI HIỆN TẠI (CURRENT STATUS)
 - **Phase 1 & 2:** Hoàn tất 100% (Core Engine, TUI Setup, Shortcut Manager, Localization, GitHub Release).
-- **Phase 3 (Tiến độ mới nhất trong phiên 4):**
-  - **Kiểm thử KDE Plasma (KWin Wayland):** Đã kiểm thử thực tế trên CachyOS Boxes.
-  - **Khắc phục lỗi KWin/Mutter chặn virtual keyboard:** Bắt chính xác exit code của `wtype`, fallback sang `ydotool` (kernel uinput) và in trực tiếp ra `stdout`, luôn đưa câu lệnh vào `wl-copy` để dán an toàn.
-  - **Tự động đăng ký phím tắt KDE & GNOME:**
-    - KDE Plasma: Tạo `tip-paste.desktop` kèm cờ `X-KDE-GlobalAccel-CommandShortcut=true`, dùng `kwriteconfig6`/`kwriteconfig5` ghi vào `kglobalshortcutsrc` và kích hoạt qua D-Bus KWin.
-    - GNOME: Ghi nhận trực tiếp qua `gsettings` custom keybindings, có hiệu lực tức thì 100%.
-  - **Cập nhật cài đặt & AUR:** Sửa `bin/tip` ưu tiên nạp thư viện tương đối, thêm `ydotool` vào `aur/PKGBUILD`, `aur/.SRCINFO` và cập nhật hướng dẫn chi tiết trong `README.md`.
+- **Phase 3 (Tiến độ mới nhất trong phiên 5):**
+  - **Kiểm thử LXDE / Openbox (X11):** Đã kiểm thử thực tế trên CachyOS Boxes.
+  - **Khắc phục lỗi Openbox Key Grab:** Tăng độ trễ nhả phím lên `0.25s` trong `lib/injector.sh`, sao chép chuỗi vào cả `clipboard` và `primary selection` (`xclip`), giúp phím tắt toàn cục hoạt động hoàn hảo 100%.
+  - **Tự động đăng ký phím tắt LXDE / Openbox:** Chuyển đổi cú pháp sang Openbox XML (`W-S-v`), chèn/cập nhật `lxde-rc.xml` / `rc.xml` và reload tức thì qua `openbox --reconfigure`.
+  - **Kiểm thử KDE Plasma (KWin Wayland):** Đã kiểm thử thực tế và hoàn tất ở phiên trước.
 - **Mã nguồn đã phát hành:** [https://github.com/chiconcota/terminal-image-paste](https://github.com/chiconcota/terminal-image-paste) trên nhánh `main`.
 
 ## 2. CÔNG VIỆC BÀN GIAO CHO PHIÊN TIẾP THEO (NEXT TASKS)

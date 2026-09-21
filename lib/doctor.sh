@@ -44,6 +44,8 @@ _tip_doctor_detect_de() {
         echo "KDE Plasma (KWin)"
     elif pgrep -x gnome-shell &>/dev/null || [[ "$de" =~ [Gg][Nn][Oo][Mm][Ee] ]]; then
         echo "GNOME (Mutter)"
+    elif pgrep -x openbox &>/dev/null || [[ "$de" =~ (LXDE|Openbox|OPENBOX) ]]; then
+        echo "LXDE (Openbox)"
     elif [[ -n "$de" ]]; then
         echo "$de"
     else
