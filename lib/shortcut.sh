@@ -113,13 +113,112 @@ tip_shortcut_install_niri() {
     return 0
 }
 
+# Chuyển đổi định dạng hotkey sang cú pháp KDE Plasma (ví dụ: <Ctrl><Super>v -> Ctrl+Meta+V)
+tip_shortcut_to_kde() {
+    local raw="$1"
+    raw=$(tip_decode_csi_u "$raw")
+
+    # Xóa ký tự < và đổi > thành +
+    local formatted
+    formatted=$(echo "$raw" | sed -e 's/<//g' -e 's/>/+/g' -e 's/++*/+/g' -e 's/+$//' -e 's/^+//')
+
+    # Chuẩn hóa tên phím sang dạng KDE: Meta (Super), Ctrl, Shift, Alt
+    formatted=$(echo "$formatted" | sed -E \
+        -e 's/\b(super|win)\b/Meta/Ig' \
+        -e 's/\b(ctrl|control)\b/Ctrl/Ig' \
+        -e 's/\b(shift)\b/Shift/Ig' \
+        -e 's/\b(alt)\b/Alt/Ig')
+
+    # Viết hoa ký tự cuối nếu là chữ cái đơn (ví dụ: +v -> +V)
+    formatted=$(echo "$formatted" | sed -E 's/\+([a-z])$/+\U\1/')
+    echo "$formatted"
+}
+
+# Cài đặt phím tắt tự động vào KDE Plasma (KDE 5 / 6 qua kglobalshortcutsrc)
+tip_shortcut_install_kde() {
+    local raw_hotkey="$1"
+    local kde_hotkey
+    kde_hotkey=$(tip_shortcut_to_kde "$raw_hotkey")
+    if [[ -z "$kde_hotkey" ]]; then
+        echo "Error: Invalid or empty hotkey combination." >&2
+        return 1
+    fi
+
+    local bin_path
+    bin_path="$(which tip 2>/dev/null || echo "$HOME/.local/bin/tip")"
+
+    # 1. Tạo file desktop entry cho KDE Custom Shortcuts
+    local apps_dir="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
+    mkdir -p "$apps_dir"
+    local desktop_file="${apps_dir}/tip-paste.desktop"
+    cat > "$desktop_file" <<EOF
+[Desktop Entry]
+Exec=${bin_path} paste
+Name=Terminal Image Paste
+Comment=Paste image from clipboard into terminal
+NoDisplay=true
+StartupNotify=false
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true
+EOF
+    chmod +x "$desktop_file" 2>/dev/null || true
+
+    # 2. Ghi cấu hình vào kglobalshortcutsrc
+    local kwriter=""
+    if command -v kwriteconfig6 &>/dev/null; then
+        kwriter="kwriteconfig6"
+    elif command -v kwriteconfig5 &>/dev/null; then
+        kwriter="kwriteconfig5"
+    fi
+
+    if [[ -n "$kwriter" ]]; then
+        "$kwriter" --file kglobalshortcutsrc --group "tip-paste.desktop" --key "_launch" "${kde_hotkey},none,Terminal Image Paste"
+        "$kwriter" --file kglobalshortcutsrc --group "tip-paste.desktop" --key "_k_friendly_name" "Terminal Image Paste"
+    else
+        # Fallback cập nhật trực tiếp tệp cấu hình ~/.config/kglobalshortcutsrc
+        local kconfig="${XDG_CONFIG_HOME:-$HOME/.config}/kglobalshortcutsrc"
+        mkdir -p "$(dirname "$kconfig")"
+        touch "$kconfig"
+        if grep -q "^\[tip-paste\.desktop\]" "$kconfig" 2>/dev/null; then
+            awk -v hotkey="${kde_hotkey}" '
+                BEGIN { in_group=0 }
+                /^\[tip-paste\.desktop\]/ { in_group=1; print; next }
+                /^\[/ { in_group=0 }
+                in_group && /^_launch=/ { print "_launch=" hotkey ",none,Terminal Image Paste"; next }
+                { print }
+            ' "$kconfig" > "${kconfig}.tmp" && mv "${kconfig}.tmp" "$kconfig"
+        else
+            cat >> "$kconfig" <<EOF
+
+[tip-paste.desktop]
+_k_friendly_name=Terminal Image Paste
+_launch=${kde_hotkey},none,Terminal Image Paste
+EOF
+        fi
+    fi
+
+    # 3. Yêu cầu KWin / kglobalaccel tải lại phím tắt qua D-Bus
+    qdbus6 org.kde.KWin /KWin reconfigure 2>/dev/null || \
+    qdbus org.kde.KWin /KWin reconfigure 2>/dev/null || \
+    qdbus org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel.reconfigure 2>/dev/null || true
+
+    echo "Configured shortcut for KDE Plasma: ${kde_hotkey}"
+    return 0
+}
+
 # Coordinate shortcut installation by Display Server & Compositor
 tip_shortcut_install() {
     local hotkey="${1:-$HOTKEY}"
-    local compositor="${XDG_CURRENT_DESKTOP:-unknown}"
+    local compositor="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+
+    # Check KDE Plasma
+    if pgrep -x "kwin_wayland" >/dev/null 2>&1 || pgrep -x "kwin_x11" >/dev/null 2>&1 || [[ "$compositor" =~ (KDE|Plasma|KWin) ]]; then
+        tip_shortcut_install_kde "$hotkey"
+        return $?
+    fi
 
     # Check Niri
-    if [[ "$compositor" =~ [Nn]iri ]] || pgrep -x "niri" >/dev/null 2>&1 || [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]]; then
+    if pgrep -x "niri" >/dev/null 2>&1 || [[ "$compositor" =~ [Nn]iri ]] || [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]]; then
         tip_shortcut_install_niri "$hotkey"
         return $?
     fi

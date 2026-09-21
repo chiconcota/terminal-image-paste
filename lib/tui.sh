@@ -115,15 +115,25 @@ tip_tui_select_hotkey() {
         tip_config_set "HOTKEY" "$chosen_hotkey"
         echo -e "\n${C_GREEN}✔ Saved new shortcut: ${C_BOLD}${chosen_hotkey}${C_RESET}"
 
-        # Option to sync with Niri
+        # Determine desktop environment name for user-friendly prompt
+        local de_name="Window Manager"
+        local de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+        if pgrep -x "kwin_wayland" &>/dev/null || pgrep -x "kwin_x11" &>/dev/null || [[ "$de" =~ (KDE|Plasma|KWin) ]]; then
+            de_name="KDE Plasma Shortcuts"
+        elif pgrep -x "niri" &>/dev/null || [[ "$de" =~ [Nn]iri ]]; then
+            de_name="Niri config (config.kdl)"
+        elif pgrep -x "Hyprland" &>/dev/null || [[ "$de" =~ [Hh]yprland ]]; then
+            de_name="Hyprland config (hyprland.conf)"
+        fi
+
         echo ""
-        read -r -p "Automatically update this shortcut in Niri config (config.kdl)? [Y/n]: " sync_wm
+        read -r -p "Automatically register this shortcut in ${de_name}? [Y/n]: " sync_wm
         if [[ -z "$sync_wm" || "$sync_wm" =~ ^[Yy] ]]; then
             echo ""
             if tip_shortcut_install "$chosen_hotkey"; then
-                echo -e "${C_GREEN}✔ Successfully updated Niri configuration!${C_RESET}"
+                echo -e "${C_GREEN}✔ Successfully registered shortcut in ${de_name}!${C_RESET}"
             else
-                echo -e "${C_YELLOW}⚠ Could not update Niri automatically. You can bind it manually.${C_RESET}"
+                echo -e "${C_YELLOW}⚠ Could not register shortcut automatically. You can bind it manually.${C_RESET}"
             fi
             read -r -p "Press Enter to continue..." _
         fi
