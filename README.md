@@ -140,7 +140,7 @@ bind = SUPER CTRL, V, exec, tip paste
 
 **CachyOS Noctalia Lua (`~/.config/hypr/config/binds.lua`):**
 ```lua
-hl.bind("SUPER CTRL", "V", "exec", "tip paste")
+hl.bind(mainMod .. " + CONTROL + V", hl.dsp.exec_cmd("tip paste"))
 ```
 
 ---

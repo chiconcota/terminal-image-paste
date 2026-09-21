@@ -23,7 +23,7 @@
 - **Quyết định:**
   1. **Loại bỏ tính năng Auto-Install dotfiles:** Xóa toàn bộ logic tự động ghi file cấu hình trong `lib/shortcut.sh`.
   2. **Tái cấu trúc thành Shortcut Guide:**
-     - Cung cấp tính năng tự nhận diện môi trường (`tip_detect_wm`) và in snippet mẫu chuẩn xác cho Niri, Hyprland (Standard & Lua), Sway, i3, KDE Plasma, GNOME, Openbox.
+     - Cung cấp tính năng tự nhận diện môi trường (`tip_detect_wm`) và in snippet mẫu chuẩn xác cho Niri, Hyprland (Standard & Lua: `hl.bind(mainMod .. " + CONTROL + V", hl.dsp.exec_cmd("tip paste"))`), Sway, i3, KDE Plasma, GNOME, Openbox.
      - Lệnh CLI: `tip shortcut [wm|all]` hoặc `tip guide [wm|all]`.
      - Menu TUI mục `[3]`: Đổi thành `📖 Shortcut Setup Guide (How to bind hotkey)`, cho phép xem hướng dẫn theo môi trường hiện tại hoặc toàn bộ.
   3. **Tài liệu hóa:** Cập nhật `README.md` với các khối snippet trực quan, dễ copy-paste.

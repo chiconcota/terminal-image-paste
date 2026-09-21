@@ -54,7 +54,7 @@ tip_shortcut_guide_hyprland() {
     echo ""
     echo -e "  ${C_BOLD}CachyOS Noctalia Lua:${C_RESET} ${C_YELLOW}~/.config/hypr/config/binds.lua${C_RESET}"
     echo ""
-    echo -e "${C_GREEN}    hl.bind(\"SUPER CTRL\", \"V\", \"exec\", \"tip paste\")${C_RESET}"
+    echo -e "${C_GREEN}    hl.bind(mainMod .. \" + CONTROL + V\", hl.dsp.exec_cmd(\"tip paste\"))${C_RESET}"
     echo ""
     echo -e "  ${C_DIM}(Hyprland reloads automatically upon saving)${C_RESET}"
 }
