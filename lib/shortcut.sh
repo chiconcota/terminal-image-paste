@@ -87,6 +87,9 @@ tip_shortcut_guide_kde() {
     echo -e "  3. Name: ${C_GREEN}Terminal Image Paste${C_RESET}"
     echo -e "  4. Command: ${C_GREEN}tip paste${C_RESET}"
     echo -e "  5. Trigger: Assign ${C_YELLOW}Meta+Ctrl+V${C_RESET} (or ${C_YELLOW}Meta+Shift+V${C_RESET}) and click Apply."
+    echo ""
+    echo -e "  ${C_DIM}💡 Note for KDE Wayland: To enable automated keystroke injection:${C_RESET}"
+    echo -e "     ${C_YELLOW}sudo usermod -aG input \$USER && systemctl --user enable --now ydotool${C_RESET}"
 }
 
 tip_shortcut_guide_gnome() {
@@ -96,6 +99,9 @@ tip_shortcut_guide_gnome() {
     echo -e "  2. Name: ${C_GREEN}Terminal Image Paste${C_RESET}"
     echo -e "  3. Command: ${C_GREEN}tip paste${C_RESET}"
     echo -e "  4. Shortcut: Press ${C_YELLOW}Super+Ctrl+V${C_RESET} (or ${C_YELLOW}Super+Shift+V${C_RESET})"
+    echo ""
+    echo -e "  ${C_DIM}💡 Note for GNOME Wayland: To enable automated keystroke injection:${C_RESET}"
+    echo -e "     ${C_YELLOW}sudo usermod -aG input \$USER && systemctl --user enable --now ydotool${C_RESET}"
 }
 
 tip_shortcut_guide_openbox() {
