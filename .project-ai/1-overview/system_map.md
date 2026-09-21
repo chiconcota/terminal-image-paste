@@ -85,6 +85,8 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
   - Chuyển đổi mục `[3]` trong TUI `lib/tui.sh` thành giao diện xem hướng dẫn phím tắt (Shortcut Setup Guide).
   - Bổ sung lệnh CLI `tip shortcut [wm|all]` và `tip guide [wm|all]` để xem snippet nhanh trong terminal.
   - Cập nhật tài liệu `README.md` với các ví dụ copy-paste mẫu.
+  - Chuẩn hóa cú pháp Hyprland Lua (`hl.bind(mainMod .. " + CONTROL + V", hl.dsp.exec_cmd("tip paste"))`) và bổ sung ghi chú `ydotool` cho KDE & GNOME Wayland.
+  - Phát hành phiên bản `v1.1.1` sẵn sàng cho kiểm thử trên Ubuntu và Fedora.
 - **2026-09-21 (Phiên 6 - Native Lua Dispatcher cho Hyprland & Thu gọn Auto-Shortcut cho Niri):**
   - Khắc phục lỗi gõ phím ảo trên Hyprland (Wayland): `wtype -k v` phát sinh scancode 1 (`KEY_ESC`) kết hợp `Ctrl+Shift` kích hoạt nhầm `btop` hệ thống.
   - Tích hợp Hyprland Lua native dispatcher (`hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })'`) với độ trễ 0.1s, hoàn toàn triệt tiêu va chạm phím ảo và dán tức thì vào terminal active.

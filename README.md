@@ -72,9 +72,11 @@ tip doctor
 ```
 
 **Recommended dependencies for your distro:**
-- **Arch Linux:** `sudo pacman -S wl-clipboard wtype timg` (Wayland) or `sudo pacman -S xclip xdotool timg` (X11)
-- **Debian / Ubuntu:** `sudo apt install wl-clipboard wtype timg` (Wayland) or `sudo apt install xclip xdotool` (X11)
-- **Fedora:** `sudo dnf install wl-clipboard wtype timg` (Wayland)
+- **Arch Linux:** `sudo pacman -S wl-clipboard wtype timg` (Wayland / Niri / Hyprland) or `sudo pacman -S xclip xdotool timg` (X11)
+- **Debian / Ubuntu:** `sudo apt install wl-clipboard ydotool timg` (GNOME Wayland) or `sudo apt install xclip xdotool` (X11)
+- **Fedora:** `sudo dnf install wl-clipboard ydotool timg` (GNOME Wayland)
+
+*(Note: For GNOME / KDE Wayland, after installing `ydotool`, enable the background service: `sudo usermod -aG input $USER && systemctl --user enable --now ydotool`)*
 
 ### 3. Configure
 
