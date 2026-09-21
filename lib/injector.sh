@@ -12,7 +12,21 @@ _tip_inject_wayland() {
         printf "%s" "$text" | wl-copy --primary 2>/dev/null || true
     fi
 
-    # 1. Preferred: Clipboard Paste via wtype (Instant 0ms, zero scancode collision)
+    # 1. Preferred (Hyprland): Native sendshortcut dispatcher (zero virtual-keyboard bug, zero scancode collision)
+    local de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+    if { pgrep -x Hyprland &>/dev/null || [[ "$de" =~ [Hh]yprland ]]; } && command -v hyprctl &>/dev/null; then
+        sleep 0.1
+        if hyprctl dispatch sendshortcut "CTRL SHIFT, V, activewindow" &>/dev/null || hyprctl dispatch sendshortcut "CTRL SHIFT, V" &>/dev/null; then
+            if [[ "$auto_enter" == "true" ]]; then
+                sleep 0.05
+                hyprctl dispatch sendshortcut ", Return, activewindow" &>/dev/null || hyprctl dispatch sendshortcut ", Return" &>/dev/null || true
+            fi
+            return 0
+        fi
+        tip_log_warn "hyprctl sendshortcut failed on Hyprland."
+    fi
+
+    # 2. Preferred (General Wayland): Clipboard Paste via wtype (Instant 0ms, zero scancode collision)
     if command -v wl-copy &>/dev/null && command -v wtype &>/dev/null; then
         sleep 0.1
         if wtype -M ctrl -M shift -k v -m shift -m ctrl 2>/dev/null; then
@@ -25,9 +39,9 @@ _tip_inject_wayland() {
         tip_log_warn "wtype keypress failed (compositor might not support zwp_virtual_keyboard_v1, e.g. KWin/Mutter)."
     fi
 
-    # 2. Fallback: Direct typing via wtype
+    # 3. Fallback: Direct typing via wtype
     if command -v wtype &>/dev/null; then
-        if wtype -p Escape -d 1 "$text" 2>/dev/null; then
+        if wtype -d 1 "$text" 2>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 wtype -k Return 2>/dev/null || true
             fi
@@ -35,7 +49,7 @@ _tip_inject_wayland() {
         fi
     fi
 
-    # 3. Fallback: ydotool (works globally on Wayland/KDE/GNOME via /dev/uinput)
+    # 4. Fallback: ydotool (works globally on Wayland/KDE/GNOME via /dev/uinput)
     if command -v ydotool &>/dev/null; then
         if ydotool type "$text" 2>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
