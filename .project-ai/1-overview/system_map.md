@@ -79,6 +79,12 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
+- **2026-09-21 (Phiên 4 - Tương thích KDE Plasma KWin, GNOME Mutter & Phím tắt Tự động):**
+  - Xử lý lỗi `wtype` không gõ được phím trên KDE Plasma / GNOME Wayland: Bắt mã lỗi exit code, fallback qua `ydotool` hoặc `stdout`, luôn đưa lệnh vào `wl-copy` để dán an toàn.
+  - Tự động hóa đăng ký phím tắt cho KDE Plasma (`~/.config/kglobalshortcutsrc` + `tip-paste.desktop` + D-Bus KWin).
+  - Tự động hóa đăng ký phím tắt cho GNOME thông qua `gsettings custom-keybindings`.
+  - Nâng cấp `bin/tip`: Ưu tiên nạp thư viện cục bộ/người dùng trước thư viện hệ thống `/usr/lib/tip`.
+  - Cập nhật `aur/PKGBUILD` và `README.md` hướng dẫn chi tiết cho KDE và GNOME.
 - **2026-09-21 (Phiên 3 - AUR Packaging, Multi-distro Installer & Electron Fix):**
   - Xử lý dứt điểm lỗi scancode bàn phím ảo của `wtype` trên Chromium/Electron (Antigravity IDE/VS Code): Chuyển sang cơ chế dán tức thì qua Clipboard (`wl-copy` / `xclip`) kết hợp phím dán `Ctrl+Shift+V`.
   - Bổ sung cơ chế thông minh Smart Fallback: Tự động tái sử dụng `/tmp/clipboard.png` gần nhất khi clipboard không chứa ảnh mới, không bao giờ báo lỗi dừng vô cớ.

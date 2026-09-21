@@ -15,6 +15,19 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-21 - 🟢 Tương thích KDE Plasma (KWin) & GNOME (Mutter), Fallback ydotool & Phím tắt Tự động
+- **Bối cảnh:**
+  1. Khi kiểm thử trên CachyOS KDE Plasma (Wayland), `wtype` thất bại do KWin không hỗ trợ `zwp_virtual_keyboard_v1`. Tuy nhiên code cũ nuốt mã lỗi (`2>/dev/null`) và `return 0` giả, khiến `tip paste` im lặng kết thúc và fish shell in prompt `~`.
+  2. Phím tắt chưa hỗ trợ tự động gán cho KDE Plasma và GNOME.
+  3. `bin/tip` ưu tiên nạp `/usr/lib/tip` trước `${HOME}/.local/lib/tip`, gây xung đột khi cài dual-mode.
+- **Quyết định:**
+  1. **Bắt mã lỗi wtype & Multi-level Fallback:** Kiểm tra chặt chẽ exit code của `wtype`. Luôn nạp dữ liệu vào `wl-copy` trước, sau đó fallback sang `ydotool` (kernel uinput), và cuối cùng fallback in ra `stdout`.
+  2. **Tự động đăng ký phím tắt KDE & GNOME:**
+     - KDE Plasma: Tạo `tip-paste.desktop` kèm cờ `X-KDE-GlobalAccel-CommandShortcut=true`, dùng `kwriteconfig6`/`kwriteconfig5` ghi vào `kglobalshortcutsrc` và kích hoạt qua D-Bus KWin.
+     - GNOME: Ghi nhận trực tiếp qua `gsettings` custom keybindings, có hiệu lực tức thì 100%.
+  3. **Ưu tiên Library Resolution:** Cập nhật `bin/tip` ưu tiên nạp thư viện tương đối (`${SOURCE_DIR}/lib/tip`, `${HOME}/.local/lib/tip`) trước khi tìm đến `/usr/lib/tip`.
+  4. **Cập nhật AUR & README:** Bổ sung `ydotool` vào `aur/PKGBUILD` và tài liệu chi tiết cách cấu hình phím tắt cho KDE/GNOME.
+
 ### 2026-09-21 - 🟢 Cơ chế Paste Clipboard Injection, Smart Fallback & Trình cài đặt Đa Distro
 - **Bối cảnh:** 
   1. `wtype` gõ từng ký tự bị Chromium/Electron (VS Code, Antigravity IDE) nhận nhầm scancode 1 thành Escape (`^[`) và scancode 14 thành Backspace (xóa mất chữ `d`).

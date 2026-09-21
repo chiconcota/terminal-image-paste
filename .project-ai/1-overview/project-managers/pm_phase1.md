@@ -13,6 +13,8 @@
 - [x] Tạo PKGBUILD và .SRCINFO để đóng gói phát hành lên Arch User Repository (AUR) -> Đã phát hành `terminal-image-paste-git`.
 - [x] Viết script cài đặt tự động `install.sh` hỗ trợ phát hiện package manager (`pacman`, `apt`, `dnf`, `zypper`).
 - [x] Sửa lỗi Chromium/Electron scancode collision & bổ sung Smart Fallback tái sử dụng ảnh.
-- [ ] Kiểm thử runtime thực tế trên các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
-- [ ] Mở rộng tự động bind phím cho các Window Manager khác: Hyprland, Sway, GNOME, KDE.
+- [x] Tương thích KDE Plasma (KWin) & GNOME (Mutter): Bắt mã lỗi `wtype`, fallback sang `ydotool` và `stdout`.
+- [x] Mở rộng tự động bind phím cho KDE Plasma (`kglobalshortcutsrc`) và GNOME (`gsettings`).
+- [ ] Kiểm thử runtime thực tế trên GNOME (trọng tâm phiên tiếp theo) và các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
+- [ ] Mở rộng tự động bind phím cho Hyprland (`hyprland.conf`) và Sway.
 
