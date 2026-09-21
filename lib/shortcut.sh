@@ -206,10 +206,105 @@ EOF
     return 0
 }
 
+# Chuyển đổi định dạng hotkey sang cú pháp GNOME (ví dụ: <Ctrl><Super>v hoặc Super+Shift+V -> <Super><Shift>v)
+tip_shortcut_to_gnome() {
+    local raw="$1"
+    raw=$(tip_decode_csi_u "$raw")
+
+    # Xóa ký tự < và đổi > thành +
+    local formatted
+    formatted=$(echo "$raw" | sed -e 's/<//g' -e 's/>/+/g' -e 's/++*/+/g' -e 's/+$//' -e 's/^+//')
+
+    local key_char
+    key_char=$(echo "$formatted" | grep -o '[^+]*$')
+    local mods
+    mods=$(echo "$formatted" | sed -E 's/\+[^+]*$//')
+
+    local gnome_mods=""
+    for m in $(echo "$mods" | tr '+' ' '); do
+        case "$m" in
+            [Ss]uper|[Ww]in) gnome_mods="${gnome_mods}<Super>" ;;
+            [Cc]trl|[Cc]ontrol) gnome_mods="${gnome_mods}<Ctrl>" ;;
+            [Ss]hift) gnome_mods="${gnome_mods}<Shift>" ;;
+            [Aa]lt) gnome_mods="${gnome_mods}<Alt>" ;;
+        esac
+    done
+
+    local lower_key
+    lower_key=$(echo "$key_char" | tr '[:upper:]' '[:lower:]')
+    echo "${gnome_mods}${lower_key}"
+}
+
+# Cài đặt phím tắt tự động vào GNOME thông qua gsettings
+tip_shortcut_install_gnome() {
+    local raw_hotkey="$1"
+    local gnome_hotkey
+    gnome_hotkey=$(tip_shortcut_to_gnome "$raw_hotkey")
+    if [[ -z "$gnome_hotkey" ]]; then
+        echo "Error: Invalid or empty hotkey combination." >&2
+        return 1
+    fi
+
+    if ! command -v gsettings &>/dev/null; then
+        echo "Error: gsettings command not found." >&2
+        return 1
+    fi
+
+    local bin_path
+    bin_path="$(which tip 2>/dev/null || echo "$HOME/.local/bin/tip")"
+    local base_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+
+    local current
+    current=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "@as []")
+
+    local target_path=""
+    if [[ "$current" =~ ($base_path/custom[0-9]+/|$base_path/tip-paste/) ]]; then
+        for p in $(echo "$current" | grep -o "'$base_path/[^']*'"); do
+            p=$(echo "$p" | tr -d "'")
+            local p_name
+            p_name=$(gsettings get "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${p}" name 2>/dev/null || true)
+            if [[ "$p_name" == "'Terminal Image Paste'" ]]; then
+                target_path="$p"
+                break
+            fi
+        done
+    fi
+
+    if [[ -z "$target_path" ]]; then
+        local max_idx=0
+        for p in $(echo "$current" | grep -o "custom[0-9]\+"); do
+            local num="${p#custom}"
+            (( num >= max_idx )) && max_idx=$((num + 1))
+        done
+        target_path="${base_path}/custom${max_idx}/"
+
+        if [[ "$current" == "@as []" || "$current" == "[]" ]]; then
+            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$target_path']"
+        else
+            local new_list
+            new_list=$(echo "$current" | sed "s|]|, '$target_path']|")
+            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_list"
+        fi
+    fi
+
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${target_path}" name 'Terminal Image Paste'
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${target_path}" command "${bin_path} paste"
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${target_path}" binding "$gnome_hotkey"
+
+    echo "Configured shortcut for GNOME: ${gnome_hotkey}"
+    return 0
+}
+
 # Coordinate shortcut installation by Display Server & Compositor
 tip_shortcut_install() {
     local hotkey="${1:-$HOTKEY}"
     local compositor="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+
+    # Check GNOME
+    if pgrep -x "gnome-shell" >/dev/null 2>&1 || [[ "$compositor" =~ (GNOME|Mutter) ]]; then
+        tip_shortcut_install_gnome "$hotkey"
+        return $?
+    fi
 
     # Check KDE Plasma
     if pgrep -x "kwin_wayland" >/dev/null 2>&1 || pgrep -x "kwin_x11" >/dev/null 2>&1 || [[ "$compositor" =~ (KDE|Plasma|KWin) ]]; then

@@ -110,6 +110,40 @@ Select your desired paste format (`timg`, `path`, or `custom`), toggle auto-ente
 
 ## ⌨️ Desktop Keybinding Setup
 
+### GNOME
+`tip` configures GNOME automatically via `gsettings` using `tip config` or:
+```bash
+tip shortcut "<Super><Shift>v"
+```
+
+Manual setup via GUI:
+1. Open **Settings** ➔ **Keyboard** ➔ **Keyboard Shortcuts** ➔ **Custom Shortcuts**.
+2. Click **+** to add a new shortcut:
+   - **Name:** `Terminal Image Paste`
+   - **Command:** `tip paste`
+   - **Shortcut:** `Super+Shift+V`
+
+> **Note for GNOME Wayland:** To allow background keystroke injection, install `ydotool`:
+> `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
+
+---
+
+### KDE Plasma (KWin)
+`tip` registers shortcuts automatically into `~/.config/kglobalshortcutsrc` via `tip config` or:
+```bash
+tip shortcut "<Super><Shift>v"
+```
+
+Manual setup via GUI:
+1. Open **System Settings** ➔ **Shortcuts** ➔ Click **Add New** ➔ **Command or Script**.
+2. Set Command to: `tip paste`
+3. Assign shortcut: `Meta+Shift+V` (Super+Shift+V) and click **Apply**.
+
+> **Note for KDE Wayland:** KWin restricts third-party virtual keyboards (`wtype`). Install `ydotool` for automated keystroke injection:
+> `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
+
+---
+
 ### Niri (`~/.config/niri/config.kdl`)
 `tip` can configure Niri automatically via `tip config` (option 3) or by running:
 ```bash
@@ -123,10 +157,14 @@ binds {
 }
 ```
 
+---
+
 ### Hyprland (`~/.config/hypr/hyprland.conf`)
 ```ini
 bind = SUPER_CTRL, B, exec, tip paste
 ```
+
+---
 
 ### Sway / i3
 ```ini

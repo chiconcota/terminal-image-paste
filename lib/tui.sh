@@ -118,7 +118,9 @@ tip_tui_select_hotkey() {
         # Determine desktop environment name for user-friendly prompt
         local de_name="Window Manager"
         local de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-        if pgrep -x "kwin_wayland" &>/dev/null || pgrep -x "kwin_x11" &>/dev/null || [[ "$de" =~ (KDE|Plasma|KWin) ]]; then
+        if pgrep -x "gnome-shell" &>/dev/null || [[ "$de" =~ (GNOME|Mutter) ]]; then
+            de_name="GNOME Shortcuts"
+        elif pgrep -x "kwin_wayland" &>/dev/null || pgrep -x "kwin_x11" &>/dev/null || [[ "$de" =~ (KDE|Plasma|KWin) ]]; then
             de_name="KDE Plasma Shortcuts"
         elif pgrep -x "niri" &>/dev/null || [[ "$de" =~ [Nn]iri ]]; then
             de_name="Niri config (config.kdl)"

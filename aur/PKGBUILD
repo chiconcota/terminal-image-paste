@@ -11,10 +11,11 @@ license=('MIT')
 depends=('bash')
 optdepends=(
     'wl-clipboard: Wayland clipboard support (recommended)'
-    'wtype: Wayland keystroke simulation (recommended)'
+    'wtype: Wayland keystroke simulation for wlroots and Niri'
+    'ydotool: Wayland keystroke simulation for KDE Plasma and GNOME'
     'xclip: X11 clipboard support'
     'xdotool: X11 keystroke simulation'
-    'timg: High-resolution terminal image viewer'
+    'timg: High-resolution terminal image viewer (recommended)'
     'chafa: Character art terminal image viewer fallback'
 )
 provides=('terminal-image-paste' 'tip')
