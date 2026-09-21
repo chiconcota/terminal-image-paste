@@ -16,7 +16,7 @@
 - [x] Tương thích KDE Plasma (KWin) & GNOME (Mutter): Bắt mã lỗi `wtype`, fallback sang `ydotool` và `stdout`.
 - [x] Tương thích LXDE (Openbox X11): Sửa lỗi key grab `sleep 0.25s` và hỗ trợ cấu hình Openbox XML.
 - [x] Tương thích Hyprland (0.56+ Lua): Giải quyết dứt điểm va chạm scancode `btop`, tích hợp native Lua dispatcher `hl.dsp.send_shortcut`.
-- [x] Tinh giản chiến lược phím tắt: Chỉ auto-bind cho Niri (`config.kdl`), các môi trường khác hỗ trợ manual snippet.
+- [x] Tinh giản chiến lược phím tắt: Chuyển đổi toàn diện sang Shortcut Setup Guide & Snippets (Zero-Risk), loại bỏ auto-modify dotfiles.
 - [ ] Kiểm thử runtime gói AUR `yay -S terminal-image-paste-git` trực tiếp trên **Niri** (Trọng tâm phiên tiếp theo).
 - [ ] Kiểm thử runtime thực tế trên GNOME và các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
 

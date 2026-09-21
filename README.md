@@ -19,7 +19,7 @@
 - 🧠 **Zero-RAM Bloat:** Defaults to static cache mode (`/tmp/clipboard.png`), overwriting the previous image so your `tmpfs` (RAM) never accumulates junk files.
 - 🎛️ **Interactive TUI Setup:** Built-in pure Bash/ANSI terminal menu (`tip config`) to configure formats, auto-enter, logging, and keybindings with zero external dependencies.
 - 🩺 **Zero-Popup Diagnostics:** Clean terminal diagnostics via `tip doctor` and self-rotating activity logs (`tip log`, max 500 lines) without annoying desktop popups.
-- ⌨️ **Automated Shortcut Setup:** One-click integration with Wayland compositors (Niri `config.kdl`, Hyprland, etc.).
+- ⌨️ **Safe & Clean Keybinding Integration:** Built-in copy-paste snippet guides (`tip shortcut`) for Niri, Hyprland, Sway, i3, KDE Plasma, GNOME, and Openbox without risking syntax errors in your personal dotfiles.
 
 ---
 
@@ -98,7 +98,7 @@ Select your desired paste format (`timg`, `path`, or `custom`), toggle auto-ente
 | `tip config set <KEY> <VAL>` | Update configuration key directly from CLI |
 | `tip config path` | Print absolute path to configuration file |
 | `tip config edit` | Open configuration file in `$EDITOR` |
-| `tip shortcut [key]` | Automatically register desktop shortcut in compositor config |
+| `tip shortcut [wm\|all]` | Display copy-paste keybinding snippets for your window manager |
 | `tip doctor` | Run comprehensive system and environment diagnostics |
 | `tip log` | View last 30 activity log lines |
 | `tip log -f` | Stream activity logs in realtime |
@@ -110,65 +110,78 @@ Select your desired paste format (`timg`, `path`, or `custom`), toggle auto-ente
 
 ## ⌨️ Desktop Keybinding Setup
 
-### GNOME
-`tip` configures GNOME automatically via `gsettings` using `tip config` or:
+`tip` executes via the single command `tip paste`. You only need to bind this command to your preferred shortcut in your window manager or desktop environment.
+
+To view setup snippets directly in your terminal at any time, run:
 ```bash
-tip shortcut "<Super><Shift>v"
+# Auto-detect your current environment
+tip shortcut
+
+# Or display snippets for all environments
+tip shortcut all
 ```
 
-Manual setup via GUI:
-1. Open **Settings** ➔ **Keyboard** ➔ **Keyboard Shortcuts** ➔ **Custom Shortcuts**.
-2. Click **+** to add a new shortcut:
-   - **Name:** `Terminal Image Paste`
-   - **Command:** `tip paste`
-   - **Shortcut:** `Super+Shift+V`
+### Niri (`~/.config/niri/config.kdl`)
+Add inside your `binds { ... }` block:
+```kdl
+binds {
+    Ctrl+Super+V { spawn "tip" "paste"; }
+}
+```
 
-> **Note for GNOME Wayland:** To allow background keystroke injection, install `ydotool`:
-> `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
+---
+
+### Hyprland
+
+**Standard Hyprland (`~/.config/hypr/hyprland.conf`):**
+```ini
+bind = SUPER CTRL, V, exec, tip paste
+```
+
+**CachyOS Noctalia Lua (`~/.config/hypr/config/binds.lua`):**
+```lua
+hl.bind("SUPER CTRL", "V", "exec", "tip paste")
+```
+
+---
+
+### Sway / i3 (`~/.config/sway/config` or `~/.config/i3/config`)
+```ini
+bindsym $mod+Ctrl+v exec tip paste
+```
 
 ---
 
 ### KDE Plasma (KWin)
-`tip` registers shortcuts automatically into `~/.config/kglobalshortcutsrc` via `tip config` or:
-```bash
-tip shortcut "<Super><Shift>v"
-```
-
-Manual setup via GUI:
 1. Open **System Settings** ➔ **Shortcuts** ➔ Click **Add New** ➔ **Command or Script**.
-2. Set Command to: `tip paste`
-3. Assign shortcut: `Meta+Shift+V` (Super+Shift+V) and click **Apply**.
+2. Set Name: `Terminal Image Paste`
+3. Set Command: `tip paste`
+4. Assign shortcut: `Meta+Ctrl+V` (or `Meta+Shift+V`) and click **Apply**.
 
 > **Note for KDE Wayland:** KWin restricts third-party virtual keyboards (`wtype`). Install `ydotool` for automated keystroke injection:
 > `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
 
 ---
 
-### Niri (`~/.config/niri/config.kdl`)
-`tip` can configure Niri automatically via `tip config` (option 3) or by running:
-```bash
-tip shortcut "Super+Ctrl+B"
-```
+### GNOME
+1. Open **Settings** ➔ **Keyboard** ➔ **Keyboard Shortcuts** ➔ **Custom Shortcuts (+)**.
+2. Set Name: `Terminal Image Paste`
+3. Set Command: `tip paste`
+4. Assign shortcut: `Super+Ctrl+V` (or `Super+Shift+V`).
 
-Manual configuration:
-```kdl
-binds {
-    Super+Ctrl+B { spawn "tip" "paste"; }
-}
-```
+> **Note for GNOME Wayland:** Install `ydotool` to allow keystroke injection across Wayland clients:
+> `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
 
 ---
 
-### Hyprland (`~/.config/hypr/hyprland.conf`)
-```ini
-bind = SUPER_CTRL, B, exec, tip paste
-```
-
----
-
-### Sway / i3
-```ini
-bindsym $mod+Control+b exec tip paste
+### Openbox / LXDE (`~/.config/openbox/lxde-rc.xml` or `rc.xml`)
+Add inside the `<keyboard>` section:
+```xml
+<keybind key="C-W-v">
+  <action name="Execute">
+    <command>tip paste</command>
+  </action>
+</keybind>
 ```
 
 ---

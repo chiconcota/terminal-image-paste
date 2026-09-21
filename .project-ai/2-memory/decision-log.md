@@ -15,6 +15,19 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-22 - 🟢 Chuyển đổi toàn diện sang Shortcut Setup Guide & Không can thiệp Dotfiles
+- **Bối cảnh:**
+  1. Việc tự động parse và chèn phím tắt vào file cấu hình của Window Manager (kể cả với Niri `config.kdl` hay KDE/GNOME/Openbox) tiềm ẩn rủi ro cao làm lỗi syntax hoặc hỏng định dạng dotfiles cá nhân của người dùng.
+  2. Việc bắt phím trong terminal TUI (nhất là với phím Super/Windows key và các mã escape CSI u) phức tạp, dễ gây hiểu lầm và bối rối cho người dùng.
+  3. Người dùng đề xuất: Bỏ hẳn mục tự động gán keybind trong TUI; tool chỉ cần thực thi tốt chức năng dán ảnh (`tip paste`) và cung cấp hướng dẫn snippet rõ ràng để người dùng tự gán theo ý mình.
+- **Quyết định:**
+  1. **Loại bỏ tính năng Auto-Install dotfiles:** Xóa toàn bộ logic tự động ghi file cấu hình trong `lib/shortcut.sh`.
+  2. **Tái cấu trúc thành Shortcut Guide:**
+     - Cung cấp tính năng tự nhận diện môi trường (`tip_detect_wm`) và in snippet mẫu chuẩn xác cho Niri, Hyprland (Standard & Lua), Sway, i3, KDE Plasma, GNOME, Openbox.
+     - Lệnh CLI: `tip shortcut [wm|all]` hoặc `tip guide [wm|all]`.
+     - Menu TUI mục `[3]`: Đổi thành `📖 Shortcut Setup Guide (How to bind hotkey)`, cho phép xem hướng dẫn theo môi trường hiện tại hoặc toàn bộ.
+  3. **Tài liệu hóa:** Cập nhật `README.md` với các khối snippet trực quan, dễ copy-paste.
+
 ### 2026-09-21 - 🟢 Tương thích Hyprland 0.56+ (Lua Dispatcher) & Tinh giản Phím tắt (Chỉ Auto-Install cho Niri)
 - **Bối cảnh:**
   1. Khi kiểm thử trên CachyOS Hyprland (Wayland), chạy `tip paste` lại kích hoạt trình giám sát hệ thống `btop` thay vì dán ảnh.

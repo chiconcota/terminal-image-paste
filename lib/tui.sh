@@ -75,70 +75,38 @@ tip_tui_select_log_level() {
     esac
 }
 
-tip_tui_select_hotkey() {
+tip_tui_show_shortcut_guide() {
     tip_tui_header
-    echo -e "${C_BOLD}Configure global hotkey (HOTKEY):${C_RESET}"
-    echo -e "  ${C_DIM}Current: ${C_YELLOW}${C_BOLD}${HOTKEY}${C_RESET}\n"
-    echo -e "  ${C_CYAN}[1]${C_RESET} ${C_BOLD}<Ctrl><Super>v${C_RESET}    - Default (Recommended, avoids desktop conflicts)"
-    echo -e "  ${C_CYAN}[2]${C_RESET} ${C_BOLD}<Super><Shift>v${C_RESET}   - Common on Linux desktops"
-    echo -e "  ${C_CYAN}[3]${C_RESET} ${C_BOLD}<Ctrl><Alt>v${C_RESET}      - Traditional key combination"
-    echo -e "  ${C_CYAN}[4]${C_RESET} ${C_BOLD}Enter custom shortcut...${C_RESET}"
+    echo -e "${C_BOLD}SHORTCUT CONFIGURATION GUIDE:${C_RESET}"
+    echo -e "${C_DIM}tip does not automatically modify your WM config files to prevent syntax corruption.${C_RESET}"
+    echo -e "${C_DIM}Simply bind the command ${C_GREEN}tip paste${C_RESET}${C_DIM} to your preferred key in your WM/DE settings.${C_RESET}\n"
+
+    local detected
+    detected=$(tip_detect_wm)
+
+    echo -e "  ${C_CYAN}[1]${C_RESET} View guide for current environment (${C_YELLOW}${detected}${C_RESET})"
+    echo -e "  ${C_CYAN}[2]${C_RESET} View snippets for ALL window managers (Niri, Hyprland, Sway, i3, KDE, GNOME, Openbox)"
     echo -e "  ${C_DIM}[0] Back to main menu${C_RESET}"
     echo ""
-    read -r -p "👉 Enter choice [0-4]: " choice
+    read -r -p "👉 Enter choice [0-2]: " guide_choice
 
-    local chosen_hotkey=""
-    case "$choice" in
-        1) chosen_hotkey="<Ctrl><Super>v" ;;
-        2) chosen_hotkey="<Super><Shift>v" ;;
-        3) chosen_hotkey="<Ctrl><Alt>v" ;;
-        4)
+    case "$guide_choice" in
+        1)
+            clear 2>/dev/null || true
+            tip_shortcut_show_guide
             echo ""
-            echo -e "${C_CYAN}${C_BOLD}Enter the shortcut you wish to assign:${C_RESET}"
-            echo -e "${C_YELLOW}⚠ Note:${C_RESET} The ${C_BOLD}Super${C_RESET} key is handled by your window manager; terminals cannot capture it directly."
-            echo -e "  If using ${C_BOLD}Super${C_RESET}, please ${C_GREEN}${C_BOLD}type it as text${C_RESET} (e.g. ${C_CYAN}Ctrl+Super+B${C_RESET}, ${C_CYAN}Super+Shift+V${C_RESET}, ${C_CYAN}<Ctrl><Super>b${C_RESET})."
-            echo -e "${C_DIM}  For Ctrl/Alt combinations (e.g. Ctrl+B, Alt+V), you may type text or press the keys directly.${C_RESET}"
-            echo ""
-            read -r -p "👉 Custom hotkey: " custom_key
-            if [[ -n "$custom_key" ]]; then
-                chosen_hotkey=$(tip_decode_csi_u "$custom_key")
-            else
-                echo -e "${C_YELLOW}No hotkey entered. Keeping previous value.${C_RESET}"
-                sleep 1
-                return 0
-            fi
+            read -r -p "Press Enter to return..." _
             ;;
-        *) return 0 ;;
-    esac
-
-    if [[ -n "$chosen_hotkey" ]]; then
-        tip_config_set "HOTKEY" "$chosen_hotkey"
-        echo -e "\n${C_GREEN}✔ Saved new shortcut: ${C_BOLD}${chosen_hotkey}${C_RESET}"
-
-        # Determine if running Niri
-        local is_niri=false
-        local de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-        if pgrep -x "niri" &>/dev/null || [[ "$de" =~ [Nn]iri ]] || [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]]; then
-            is_niri=true
-        fi
-
-        if $is_niri; then
+        2)
+            clear 2>/dev/null || true
+            tip_shortcut_guide_all
             echo ""
-            read -r -p "Automatically register this shortcut in Niri (config.kdl)? [Y/n]: " sync_wm
-            if [[ -z "$sync_wm" || "$sync_wm" =~ ^[Yy] ]]; then
-                echo ""
-                if tip_shortcut_install_niri "$chosen_hotkey"; then
-                    echo -e "${C_GREEN}✔ Successfully registered shortcut in Niri config!${C_RESET}"
-                else
-                    echo -e "${C_YELLOW}⚠ Could not register shortcut automatically. You can bind it manually.${C_RESET}"
-                fi
-                read -r -p "Press Enter to continue..." _
-            fi
-        else
-            tip_shortcut_show_manual_guide "$chosen_hotkey"
-            read -r -p "Press Enter to continue..." _
-        fi
-    fi
+            read -r -p "Press Enter to return..." _
+            ;;
+        *)
+            return 0
+            ;;
+    esac
 }
 
 tip_tui_main_menu() {
@@ -149,7 +117,7 @@ tip_tui_main_menu() {
         echo -e "${C_BOLD}CURRENT CONFIGURATION OPTIONS:${C_RESET}"
         echo -e "  ${C_CYAN}[1]${C_RESET} Output format (PASTE_FORMAT):     ${C_GREEN}${C_BOLD}${PASTE_FORMAT}${C_RESET}"
         echo -e "  ${C_CYAN}[2]${C_RESET} Auto Enter (AUTO_ENTER):          ${C_GREEN}${C_BOLD}${AUTO_ENTER}${C_RESET} ${C_DIM}(Press to toggle true/false)${C_RESET}"
-        echo -e "  ${C_CYAN}[3]${C_RESET} Global shortcut (HOTKEY):         ${C_YELLOW}${C_BOLD}${HOTKEY}${C_RESET}"
+        echo -e "  ${C_CYAN}[3]${C_RESET} 📖 Shortcut Setup Guide (How to bind hotkey)"
         echo -e "  ${C_CYAN}[4]${C_RESET} Logging level (LOG_LEVEL):        ${C_GREEN}${C_BOLD}${LOG_LEVEL}${C_RESET}"
         echo -e "  ${C_CYAN}[5]${C_RESET} Temporary directory (STORAGE):    ${C_DIM}${STORAGE_DIR}${C_RESET}"
         echo -e "  ─────────────────────────────────────────────────────────────"
@@ -162,7 +130,7 @@ tip_tui_main_menu() {
         case "$menu_choice" in
             1) tip_tui_select_format ;;
             2) tip_tui_toggle_auto_enter ;;
-            3) tip_tui_select_hotkey ;;
+            3) tip_tui_show_shortcut_guide ;;
             4) tip_tui_select_log_level ;;
             5)
                 echo ""

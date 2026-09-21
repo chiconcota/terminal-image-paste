@@ -74,7 +74,8 @@ tip_help() {
     echo -e "    ${C_CYAN}config edit${C_RESET}       Open configuration file in editor"
     echo -e "    ${C_CYAN}config path${C_RESET}       Print configuration file path"
     echo -e "    ${C_CYAN}config set <k> <v>${C_RESET} Set configuration property from CLI"
-    echo -e "    ${C_CYAN}shortcut [key]${C_RESET}    Automatically register desktop shortcut (Niri)"
+    echo -e "    ${C_CYAN}shortcut [wm|all]${C_RESET} Display shortcut setup guide & snippets for your WM/DE"
+    echo -e "    ${C_CYAN}guide [wm|all]${C_RESET}    Alias for shortcut guide"
     echo ""
     echo -e "  ${C_BOLD}Diagnostics & Logs:${C_RESET}"
     echo -e "    ${C_CYAN}doctor${C_RESET}            Run system and dependency diagnostics"
@@ -170,8 +171,8 @@ main() {
         config)
             cmd_config "$@"
             ;;
-        shortcut)
-            tip_shortcut_install "$@"
+        shortcut|guide)
+            tip_shortcut_show_guide "$@"
             ;;
         status)
             cmd_status "$@"

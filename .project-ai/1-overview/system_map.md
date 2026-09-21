@@ -8,9 +8,9 @@
 - **Display Servers hỗ trợ:**
   - **Wayland:** `wl-clipboard` (`wl-paste`, `wl-copy`), `wtype` (hoặc `ydotool`), `hyprctl dispatch` native (Hyprland).
   - **X11:** `xclip` / `xsel`, `xdotool`.
-- **Desktop Environments & Shortcut Strategy:**
-  - **Auto-Configured WM:** Duy nhất **Niri** (`~/.config/niri/config.kdl`) được hỗ trợ tự động ghi phím tắt qua CLI/TUI.
-  - **Manual Setup Compositors/DEs:** Với Hyprland, Sway, i3, KDE Plasma, GNOME... công cụ hiển thị đoạn mã hướng dẫn (snippet) thân thiện để người dùng tự copy vào dotfiles cá nhân, tránh rủi ro phá vỡ cấu hình phức tạp.
+- **Desktop Environments & Shortcut Strategy (Zero-Risk Snippets):**
+  - Công cụ hoàn toàn **không can thiệp hoặc ghi đè file cấu hình** của bất kỳ Desktop Environment hay Window Manager nào để tránh làm hỏng syntax dotfiles.
+  - Cung cấp sẵn các đoạn mã hướng dẫn (snippet) chuẩn xác (`tip shortcut`, TUI mục [3]) cho Niri, Hyprland, Sway, i3, KDE Plasma, GNOME, Openbox để người dùng tự gán vào dotfiles cá nhân một cách an toàn và chủ động.
 - **Cấu hình & Nhật ký (XDG Standard):**
   - File cấu hình: `~/.config/tip/config.conf`
   - File nhật ký lỗi/hoạt động: `~/.local/state/tip/tip.log` (tự động xoay vòng tối đa 500 dòng).
@@ -35,7 +35,7 @@ terminal-image-paste/
 │   ├── logger.sh                  # Module ghi log và xoay vòng log (~/.local/state/tip/tip.log)
 │   ├── doctor.sh                  # Module kiểm tra chẩn đoán hệ thống (Wayland/X11, packages, hotkey)
 │   ├── tui.sh                     # Module giao diện bảng cài đặt tương tác (menu chọn option)
-│   └── shortcut.sh                # Module tự động đăng ký phím tắt (Niri, GNOME, KDE, Hyprland...)
+│   └── shortcut.sh                # Module hướng dẫn cấu hình phím tắt (Niri, Hyprland, Sway, KDE...)
 ├── install.sh                     # Trình cài đặt 1-line tự động (curl -sSL ... | bash)
 └── .project-ai/                   # Hệ thống tài liệu & bộ nhớ AI Agent (4 ngăn kéo chuẩn)
     ├── 1-overview/                # Bản đồ hệ thống, kiến trúc chi tiết, roadmap từng phase
@@ -57,8 +57,8 @@ terminal-image-paste/
 | **Logger** | `lib/logger.sh` | Ghi log vào `~/.local/state/tip/tip.log`, xoay vòng tối đa 500 dòng, hiển thị khi chạy `tip log`. | 🟢 Done |
 | **System Doctor** | `lib/doctor.sh` | Kiểm tra dependencies, display server, permissions, phím tắt và in bảng chẩn đoán màu sắc. | 🟢 Done |
 | **Configuration Manager** | `lib/config.sh` | Đọc / ghi file cấu hình `~/.config/tip/config.conf`. | 🟢 Done |
-| **Interactive TUI Setup** | `lib/tui.sh` | Hiển thị bảng setting tương tác cho người dùng tùy chọn format và phím tắt. | 🟢 Done |
-| **Shortcut Manager** | `lib/shortcut.sh` | Nhận diện DE/Compositor (Niri, GNOME, KDE, Hyprland...) và bind phím tắt toàn cục. | 🟢 Done |
+| **Interactive TUI Setup** | `lib/tui.sh` | Hiển thị bảng setting tương tác cho người dùng tùy chọn format và xem hướng dẫn phím tắt. | 🟢 Done |
+| **Shortcut Manager** | `lib/shortcut.sh` | Cung cấp hướng dẫn cấu hình phím tắt (snippet) cho Niri, Hyprland, Sway, i3, KDE, GNOME, Openbox. | 🟢 Done |
 | **One-Line Installer** | `install.sh` | Tự động nhận diện distro (Arch/Ubuntu/Fedora), cài đặt dependencies và binary. | 🟢 Done |
 | **AUR Package** | `aur/PKGBUILD` | Đặc tả đóng gói phát hành lên Arch User Repository (`terminal-image-paste-git`). | 🟢 Done |
 
@@ -79,6 +79,12 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
+- **2026-09-22 (Phiên 7 - Chuyển đổi sang Shortcut Setup Guide & Triệt tiêu rủi ro hỏng Dotfiles):**
+  - Xóa bỏ hoàn toàn cơ chế tự động ghi phím tắt vào dotfiles (`config.kdl`, `kglobalshortcutsrc`, `gsettings`, XML Openbox).
+  - Tái cấu trúc `lib/shortcut.sh` thành module hướng dẫn cung cấp snippet chuẩn cho từng WM (Niri, Hyprland, Sway, i3, KDE Plasma, GNOME, Openbox).
+  - Chuyển đổi mục `[3]` trong TUI `lib/tui.sh` thành giao diện xem hướng dẫn phím tắt (Shortcut Setup Guide).
+  - Bổ sung lệnh CLI `tip shortcut [wm|all]` và `tip guide [wm|all]` để xem snippet nhanh trong terminal.
+  - Cập nhật tài liệu `README.md` với các ví dụ copy-paste mẫu.
 - **2026-09-21 (Phiên 6 - Native Lua Dispatcher cho Hyprland & Thu gọn Auto-Shortcut cho Niri):**
   - Khắc phục lỗi gõ phím ảo trên Hyprland (Wayland): `wtype -k v` phát sinh scancode 1 (`KEY_ESC`) kết hợp `Ctrl+Shift` kích hoạt nhầm `btop` hệ thống.
   - Tích hợp Hyprland Lua native dispatcher (`hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })'`) với độ trễ 0.1s, hoàn toàn triệt tiêu va chạm phím ảo và dán tức thì vào terminal active.

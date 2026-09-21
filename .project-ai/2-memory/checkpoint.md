@@ -1,24 +1,22 @@
 # CHECKPOINT & PROGRESS HANDOVER (checkpoint.md)
-@status: PHASE 3 (HYPRLAND RESOLVED 🟢 -> NEXT: NIRI AUR TESTING 🎯) | @git_branch: main | @last_update: 2026-09-21
+@status: PHASE 3 (SHORTCUT GUIDE RESOLVED 🟢 -> NEXT: NIRI RUNTIME TEST 🎯) | @git_branch: main | @last_update: 2026-09-22
 
 ## 1. TRẠNG THÁI HIỆN TẠI (CURRENT STATUS)
-- **Phase 1 & 2:** Hoàn tất 100% (Core Engine, TUI Setup, Shortcut Manager, Localization, GitHub Release).
-- **Phase 3 (Tiến độ mới nhất trong phiên 6):**
-  - **Khắc phục lỗi Hyprland mở `btop`:** Cô lập không dùng `wtype` trên Hyprland để tránh scancode 1 (`KEY_ESC`). Thay thế bằng Hyprland Lua native dispatcher (`hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })'`). Đã kiểm thử thực tế trên CachyOS Hyprland thành công 100%.
-  - **Tinh giản TUI & Quản lý phím tắt:** Tái cấu trúc mục [3] trong `lib/tui.sh` và `lib/shortcut.sh`. Chỉ tự động can thiệp file config đối với **Niri** (`~/.config/niri/config.kdl`). Các WM/Compositor khác hiển thị hướng dẫn copy snippet thủ công để đảm bảo an toàn dotfiles.
-  - **Gỡ cài đặt bản local user trên máy chính:** Đã chạy `./install.sh --uninstall` sạch sẽ, sẵn sàng cho việc kiểm thử gói AUR.
-  - **Git Status:** Đã commit và push toàn bộ lên nhánh `main` (`2fdaf74`) trên GitHub: [https://github.com/chiconcota/terminal-image-paste](https://github.com/chiconcota/terminal-image-paste). Working tree sạch 100%.
+- **Phase 1 & 2:** Hoàn tất 100% (Core Engine, TUI Setup, Localization, GitHub Release).
+- **Phase 3 (Tiến độ mới nhất trong phiên 7):**
+  - **Chuyển đổi toàn diện sang Shortcut Setup Guide:** Loại bỏ hoàn toàn việc tự động can thiệp file config dotfiles (`config.kdl`, KDE, GNOME, Openbox).
+  - **Module `lib/shortcut.sh`:** Tái cấu trúc thành công cụ nhận diện môi trường (`tip_detect_wm`) và cung cấp snippet chuẩn xác (Niri, Hyprland, Sway, i3, KDE, GNOME, Openbox).
+  - **TUI & CLI:** Cập nhật mục `[3]` trong `tip config` và lệnh CLI `tip shortcut [wm|all]` / `tip guide [wm|all]`.
+  - **Tài liệu:** Cập nhật `README.md` rõ ràng, sạch sẽ.
+  - **Khắc phục lỗi Hyprland mở `btop`:** Đã tích hợp Hyprland Lua native dispatcher (`hl.dsp.send_shortcut`) kiểm thử thành công ở phiên trước.
 
 ## 2. CÔNG VIỆC BÀN GIAO CHO PHIÊN TIẾP THEO (NEXT TASKS)
-1. **Kiểm thử trực tiếp trên Niri bằng gói AUR (`yay`) theo yêu cầu User:**
-   - Cài đặt gói chính thức qua yay: `yay -S terminal-image-paste-git`.
-   - Kiểm tra binary hệ thống `/usr/bin/tip` và thư viện `/usr/lib/tip/`.
-   - Chạy `tip config` -> Mục [3] để kiểm tra tự động gán phím tắt vào `~/.config/niri/config.kdl`.
-   - Kiểm thử thao tác copy ảnh vào clipboard và bấm phím tắt để dán ảnh vào terminal (Ghostty/Foot/Alacritty) trên Niri.
-2. **Kiểm thử runtime trên các terminal emulator khác nhau trên Niri:**
-   - Kiểm tra Ghostty, Foot, Kitty và Alacritty.
-3. **Đẩy cập nhật chính thức lên kho AUR:**
-   - Cập nhật `.SRCINFO` và đẩy lên `ssh://aur@aur.archlinux.org/terminal-image-paste-git.git` nếu cần thiết.
+1. **Kiểm thử trực tiếp phím tắt trên Niri:**
+   - Thêm snippet `Ctrl+Super+V { spawn "tip" "paste"; }` vào `~/.config/niri/config.kdl`.
+   - Copy một ảnh vào clipboard và bấm phím tắt để kiểm tra dán ảnh vào terminal trên Niri.
+2. **Commit và đẩy cập nhật lên GitHub / AUR:**
+   - Commit các thay đổi sạch sẽ trên nhánh `main`.
+   - Cập nhật `.SRCINFO` và đẩy lên repo AUR `terminal-image-paste-git` nếu cần.
 
 ## 3. DANH SÁCH FILE LIÊN QUAN
 - `1-overview/system_map.md`
