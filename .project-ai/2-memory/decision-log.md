@@ -15,6 +15,20 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-21 - 🟢 Tương thích Hyprland 0.56+ (Lua Dispatcher) & Tinh giản Phím tắt (Chỉ Auto-Install cho Niri)
+- **Bối cảnh:**
+  1. Khi kiểm thử trên CachyOS Hyprland (Wayland), chạy `tip paste` lại kích hoạt trình giám sát hệ thống `btop` thay vì dán ảnh.
+  2. Nguyên nhân: `wtype -k v` trên Hyprland bị ánh xạ nhầm thành scancode 1 (`KEY_ESC`). Kết hợp với modifiers `Ctrl+Shift`, Hyprland nhận diện `Ctrl+Shift+Escape`, vốn là phím tắt mặc định mở `btop` trên CachyOS.
+  3. Cú pháp dispatcher cũ `hyprctl dispatch sendshortcut "..."` bị lỗi cú pháp trên Hyprland 0.56+ chạy runtime Lua IPC.
+  4. Việc tự động chèn phím tắt vào dotfiles phức tạp của nhiều WM (như file Lua `binds.lua` của Noctalia/CachyOS hay hyprland.conf) tiềm ẩn rủi ro phá vỡ cấu hình người dùng.
+- **Quyết định:**
+  1. **Native Lua Dispatcher cho Hyprland (`lib/injector.sh`):**
+     - Đưa lệnh native dispatcher `hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })' &>/dev/null` lên ưu tiên số 1 khi phát hiện Hyprland.
+     - Cách ly hoàn toàn, không bao giờ rơi vào `wtype` khi ở môi trường Hyprland để triệt tiêu vĩnh viễn lỗi scancode `btop`.
+  2. **Tinh giản phạm vi Auto-Install phím tắt (`lib/shortcut.sh` & `lib/tui.sh`):**
+     - **Chỉ tự động cài đặt cho Niri:** Niri có cấu trúc KDL chuẩn tắc, an toàn và đồng nhất (`~/.config/niri/config.kdl`).
+     - **Compositor/DE khác:** Không tự ý ghi đè file config của người dùng; thay vào đó, in đoạn snippet hướng dẫn (`tip_shortcut_show_manual_guide`) rõ ràng, sạch sẽ để người dùng tự copy vào file cấu hình.
+
 ### 2026-09-21 - 🟢 Tương thích LXDE (Openbox), Sửa lỗi Key Grab X11 & Tự động gán Phím tắt
 - **Bối cảnh:**
   1. Khi kiểm thử trên CachyOS LXDE (X11), phím tắt toàn cục trong `lxhotkey` gọi `tip paste` nhưng terminal không dán được.

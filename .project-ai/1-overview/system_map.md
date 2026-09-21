@@ -1,16 +1,16 @@
 # SYSTEM MAP: TERMINAL IMAGE PASTE (`tip`)
-@status: 🟢 PHASE 3 IMPLEMENTATION | @git_branch: main | @last_update: 2026-09-21
+@status: 🟢 PHASE 3 IMPLEMENTATION (HYPRLAND FIX & NIRI DEDICATED) | @git_branch: main | @last_update: 2026-09-21
 
 ---
 
 ## 1. TỔNG QUAN & TECH STACK (OVERVIEW & TECH STACK)
 - **Mục tiêu:** Công cụ tiện ích dòng lệnh (CLI / Daemon) giúp dán nhanh ảnh từ clipboard vào terminal dưới dạng đường dẫn file, lệnh xem ảnh (`timg`), hoặc Markdown trên **mọi bản phân phối Linux**.
 - **Display Servers hỗ trợ:**
-  - **Wayland:** `wl-clipboard` (`wl-paste`, `wl-copy`), `wtype` (hoặc `ydotool`).
+  - **Wayland:** `wl-clipboard` (`wl-paste`, `wl-copy`), `wtype` (hoặc `ydotool`), `hyprctl dispatch` native (Hyprland).
   - **X11:** `xclip` / `xsel`, `xdotool`.
-- **Desktop Environments (Auto-detect Shortcut):**
-  - **Wayland Compositors:** Niri (`config.kdl`), Hyprland / Sway (`config file append`).
-  - **Desktop Environments:** GNOME (`gsettings`), KDE Plasma (`kwriteconfig` / `kglobalaccel`), LXDE / Openbox (`lxde-rc.xml` / `rc.xml`), XFCE (`xfconf-query`), i3.
+- **Desktop Environments & Shortcut Strategy:**
+  - **Auto-Configured WM:** Duy nhất **Niri** (`~/.config/niri/config.kdl`) được hỗ trợ tự động ghi phím tắt qua CLI/TUI.
+  - **Manual Setup Compositors/DEs:** Với Hyprland, Sway, i3, KDE Plasma, GNOME... công cụ hiển thị đoạn mã hướng dẫn (snippet) thân thiện để người dùng tự copy vào dotfiles cá nhân, tránh rủi ro phá vỡ cấu hình phức tạp.
 - **Cấu hình & Nhật ký (XDG Standard):**
   - File cấu hình: `~/.config/tip/config.conf`
   - File nhật ký lỗi/hoạt động: `~/.local/state/tip/tip.log` (tự động xoay vòng tối đa 500 dòng).
@@ -79,6 +79,11 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
+- **2026-09-21 (Phiên 6 - Native Lua Dispatcher cho Hyprland & Thu gọn Auto-Shortcut cho Niri):**
+  - Khắc phục lỗi gõ phím ảo trên Hyprland (Wayland): `wtype -k v` phát sinh scancode 1 (`KEY_ESC`) kết hợp `Ctrl+Shift` kích hoạt nhầm `btop` hệ thống.
+  - Tích hợp Hyprland Lua native dispatcher (`hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })'`) với độ trễ 0.1s, hoàn toàn triệt tiêu va chạm phím ảo và dán tức thì vào terminal active.
+  - Tái cấu trúc chiến lược phím tắt (`lib/shortcut.sh` & `lib/tui.sh`): Chỉ tự động đăng ký cho **Niri**; đối với các WM/Compositor khác (Hyprland, Sway, i3, KDE, GNOME), hiển thị bảng hướng dẫn copy-paste snippet mẫu chuẩn xác.
+  - Gỡ cài đặt bản local user trên máy chính (`./install.sh --uninstall`), chuẩn bị sẵn sàng kiểm thử AUR package (`yay -S terminal-image-paste-git`) trên Niri.
 - **2026-09-21 (Phiên 5 - Hỗ trợ LXDE / Openbox & Khắc phục Key Grab X11):**
   - Khắc phục lỗi nuốt phím tắt trên X11/Openbox: Tăng độ trễ nhả phím lên `0.25s` trong `lib/injector.sh`, sao chép dữ liệu vào cả clipboard và primary selection (`xclip`).
   - Xây dựng adapter tự động đăng ký phím tắt cho LXDE / Openbox: Tự động chuyển đổi sang cú pháp Openbox XML (`W-S-v`, `C-W-v`), cập nhật `lxde-rc.xml` / `rc.xml` và reload tức thì qua `openbox --reconfigure`.

@@ -34,7 +34,8 @@
 
 ### `lib/injector.sh`
 - `tip_inject_text(text, auto_enter)`: Dán chuỗi vào terminal active:
-  - **Preferred:** Clipboard Injection qua `wl-copy` (cả Clipboard & Primary) / `xclip` rồi gửi phím `Ctrl+Shift+V` qua `wtype` (Wayland) hoặc `xdotool` (X11).
+  - **Preferred (Hyprland):** Gọi trực tiếp native dispatcher qua Lua IPC `hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })'`, cô lập hoàn toàn không dùng `wtype` trên Hyprland để triệt tiêu lỗi scancode va chạm phím tắt `btop`.
+  - **Preferred (Wayland nói chung - Niri/Sway):** Clipboard Injection qua `wl-copy` (cả Clipboard & Primary) rồi gửi phím `Ctrl+Shift+V` qua `wtype`.
   - **X11 Key Grab Protection:** Sử dụng `sleep 0.25s` để đảm bảo Window Manager (Openbox, XFCE, i3) giải phóng toàn quyền bàn phím (`XGrabKeyboard`), nạp chuỗi vào cả `clipboard` và `primary selection`.
   - **Fail-Safe & Multi-Compositor Fallback:** Bắt chính xác exit code của `wtype`; nếu compositor không hỗ trợ `virtual-keyboard-v1` (như KWin của KDE hay Mutter của GNOME), tự động chuyển sang `ydotool` (thông qua `/dev/uinput`), hoặc in trực tiếp ra `stdout`.
 
@@ -44,15 +45,13 @@
 ### `lib/tui.sh`
 - `tip_tui_main_menu()`: Bảng điều khiển tương tác TUI (chọn format, auto-enter, hotkey, log level, doctor, log).
 - `tip_tui_select_format()`, `tip_tui_toggle_auto_enter()`, `tip_tui_select_log_level()`, `tip_tui_select_hotkey()`.
-- Tự động nhận diện desktop environment để hiển thị thông báo gán phím tắt thân thiện (`KDE Plasma Shortcuts`, `GNOME Shortcuts`, `LXDE / Openbox config`, `Niri config`...).
+- **Mục [3] Tinh giản phím tắt:** Tự động hỏi cài đặt cho Niri (`config.kdl`); với tất cả các môi trường khác, in hướng dẫn copy-paste snippet rõ ràng, không can thiệp file cấu hình.
 
 ### `lib/shortcut.sh`
 - `tip_decode_csi_u(input)`: Giải mã chuỗi escape CSI u từ Ghostty/Kitty (ví dụ: `^[[98;5u` -> `Ctrl+B`).
-- `tip_shortcut_to_niri(raw)` / `tip_shortcut_install_niri(hotkey)`: Định dạng và ghi phím tắt vào `~/.config/niri/config.kdl`.
-- `tip_shortcut_to_kde(raw)` / `tip_shortcut_install_kde(hotkey)`: Chuẩn hóa sang `Meta+...`, tạo `.desktop` action và ghi vào `kglobalshortcutsrc` kèm lệnh reload D-Bus KWin.
-- `tip_shortcut_to_gnome(raw)` / `tip_shortcut_install_gnome(hotkey)`: Chuẩn hóa sang `<Super>...` và cấu hình tức thì qua `gsettings` custom keybindings.
-- `tip_shortcut_to_openbox(raw)` / `tip_shortcut_install_lxde(hotkey)`: Chuẩn hóa sang cú pháp Openbox XML (`W-S-v`, `C-W-v`), ghi vào `~/.config/openbox/lxde-rc.xml` và nạp lại tức thì qua `openbox --reconfigure`.
-- `tip_shortcut_install(hotkey)`: Tự động điều hướng cài đặt phím tắt theo compositor đang chạy.
+- `tip_shortcut_to_niri(raw)` / `tip_shortcut_install_niri(hotkey)`: Định dạng và ghi phím tắt tự động vào `~/.config/niri/config.kdl`.
+- `tip_shortcut_show_manual_guide(hotkey)`: In đoạn cấu hình mẫu (snippet) dành riêng cho từng môi trường (Hyprland hyprland.conf & binds.lua, Sway, i3, KDE Plasma, GNOME).
+- `tip_shortcut_install(hotkey)`: Điều hướng tự động: chỉ ghi file đối với Niri, các môi trường khác gọi `tip_shortcut_show_manual_guide`.
 
 ---
 
