@@ -15,6 +15,8 @@
 - [x] Sửa lỗi Chromium/Electron scancode collision & bổ sung Smart Fallback tái sử dụng ảnh.
 - [x] Tương thích KDE Plasma (KWin) & GNOME (Mutter): Bắt mã lỗi `wtype`, fallback sang `ydotool` và `stdout`.
 - [x] Mở rộng tự động bind phím cho KDE Plasma (`kglobalshortcutsrc`) và GNOME (`gsettings`).
-- [ ] Kiểm thử runtime thực tế trên GNOME (trọng tâm phiên tiếp theo) và các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
-- [ ] Mở rộng tự động bind phím cho Hyprland (`hyprland.conf`) và Sway.
+- [x] Tương thích LXDE (Openbox X11): Sửa lỗi key grab `sleep 0.25s` và tự động bind phím vào `lxde-rc.xml` / `rc.xml`.
+- [ ] Kiểm thử runtime và mở rộng tự động bind phím cho **Hyprland (`hyprland.conf`)** (Trọng tâm phiên tiếp theo).
+- [ ] Kiểm thử runtime thực tế trên GNOME và các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
+- [ ] Mở rộng tự động bind phím cho Sway.
 

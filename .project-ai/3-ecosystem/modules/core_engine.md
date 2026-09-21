@@ -6,7 +6,7 @@
 ## 1. TRÁCH NHIỆM CỐT LÕI (RESPONSIBILITIES)
 - Cung cấp giao diện CLI thống nhất (`bin/tip`) cho người dùng cuối.
 - Tự động nhận diện Display Server (Wayland hoặc X11) và trích xuất ảnh nhị phân từ clipboard sang file tạm trong `$STORAGE_DIR`.
-- Định dạng chuỗi xuất phù hợp (`path`, `timg <path>`, `![](<path>)`, `custom`) và mô phỏng gõ phím vào terminal active qua `wtype` hoặc `xdotool`.
+- Định dạng chuỗi xuất phù hợp (`path`, `timg <path>`, )`, `custom`) và mô phỏng gõ phím vào terminal active qua `wtype` hoặc `xdotool`.
 - Ghi log chuẩn XDG (`~/.local/state/tip/tip.log`) với cơ chế xoay vòng tối đa 500 dòng (Zero-Popup).
 - Cung cấp công cụ chẩn đoán hệ thống toàn diện (`tip doctor`).
 
@@ -34,22 +34,24 @@
 
 ### `lib/injector.sh`
 - `tip_inject_text(text, auto_enter)`: Dán chuỗi vào terminal active:
-  - **Preferred:** Clipboard Injection qua `wl-copy` (cả Clipboard & Primary) / `xclip` rồi gửi phím `Ctrl+Shift+V` qua `wtype` (tức thì 0ms, miễn nhiễm lỗi scancode Chromium/Electron).
+  - **Preferred:** Clipboard Injection qua `wl-copy` (cả Clipboard & Primary) / `xclip` rồi gửi phím `Ctrl+Shift+V` qua `wtype` (Wayland) hoặc `xdotool` (X11).
+  - **X11 Key Grab Protection:** Sử dụng `sleep 0.25s` để đảm bảo Window Manager (Openbox, XFCE, i3) giải phóng toàn quyền bàn phím (`XGrabKeyboard`), nạp chuỗi vào cả `clipboard` và `primary selection`.
   - **Fail-Safe & Multi-Compositor Fallback:** Bắt chính xác exit code của `wtype`; nếu compositor không hỗ trợ `virtual-keyboard-v1` (như KWin của KDE hay Mutter của GNOME), tự động chuyển sang `ydotool` (thông qua `/dev/uinput`), hoặc in trực tiếp ra `stdout`.
 
 ### `lib/doctor.sh`
-- `tip_run_doctor()`: Chẩn đoán môi trường OS, display server (Wayland/X11), Desktop/Compositor (Niri, Hyprland, Sway, KDE Plasma, GNOME). Cảnh báo khả năng tương thích của `wtype` và kiểm tra trạng thái hoạt động của `ydotool`/`ydotoold`.
+- `tip_run_doctor()`: Chẩn đoán môi trường OS, display server (Wayland/X11), Desktop/Compositor (Niri, Hyprland, Sway, KDE Plasma, GNOME, LXDE / Openbox). Cảnh báo khả năng tương thích của `wtype` và kiểm tra trạng thái hoạt động của `ydotool`/`ydotoold`.
 
 ### `lib/tui.sh`
 - `tip_tui_main_menu()`: Bảng điều khiển tương tác TUI (chọn format, auto-enter, hotkey, log level, doctor, log).
 - `tip_tui_select_format()`, `tip_tui_toggle_auto_enter()`, `tip_tui_select_log_level()`, `tip_tui_select_hotkey()`.
-- Tự động nhận diện desktop environment để hiển thị thông báo gán phím tắt thân thiện (`KDE Plasma Shortcuts`, `GNOME Shortcuts`, `Niri config`...).
+- Tự động nhận diện desktop environment để hiển thị thông báo gán phím tắt thân thiện (`KDE Plasma Shortcuts`, `GNOME Shortcuts`, `LXDE / Openbox config`, `Niri config`...).
 
 ### `lib/shortcut.sh`
 - `tip_decode_csi_u(input)`: Giải mã chuỗi escape CSI u từ Ghostty/Kitty (ví dụ: `^[[98;5u` -> `Ctrl+B`).
 - `tip_shortcut_to_niri(raw)` / `tip_shortcut_install_niri(hotkey)`: Định dạng và ghi phím tắt vào `~/.config/niri/config.kdl`.
 - `tip_shortcut_to_kde(raw)` / `tip_shortcut_install_kde(hotkey)`: Chuẩn hóa sang `Meta+...`, tạo `.desktop` action và ghi vào `kglobalshortcutsrc` kèm lệnh reload D-Bus KWin.
 - `tip_shortcut_to_gnome(raw)` / `tip_shortcut_install_gnome(hotkey)`: Chuẩn hóa sang `<Super>...` và cấu hình tức thì qua `gsettings` custom keybindings.
+- `tip_shortcut_to_openbox(raw)` / `tip_shortcut_install_lxde(hotkey)`: Chuẩn hóa sang cú pháp Openbox XML (`W-S-v`, `C-W-v`), ghi vào `~/.config/openbox/lxde-rc.xml` và nạp lại tức thì qua `openbox --reconfigure`.
 - `tip_shortcut_install(hotkey)`: Tự động điều hướng cài đặt phím tắt theo compositor đang chạy.
 
 ---
