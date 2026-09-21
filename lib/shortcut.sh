@@ -399,36 +399,55 @@ EOF
     return 0
 }
 
-# Coordinate shortcut installation by Display Server & Compositor
+# Hiển thị hướng dẫn cấu hình phím tắt thủ công cho các Window Manager / Desktop ngoài Niri
+tip_shortcut_show_manual_guide() {
+    local raw_hotkey="$1"
+    local compositor="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+
+    echo -e "\n\033[1m📋 Hướng dẫn cài đặt phím tắt thủ công:\033[0m"
+    echo -e "Lệnh cần kích hoạt khi nhấn phím tắt: \033[32m\033[1mtip paste\033[0m\n"
+
+    if pgrep -x "Hyprland" &>/dev/null || [[ "$compositor" =~ [Hh]yprland ]]; then
+        echo -e "\033[36m▶ Dành cho Hyprland:\033[0m"
+        echo -e "  • \033[1mCấu hình chuẩn (~/.config/hypr/hyprland.conf):\033[0m"
+        echo -e "    bind = SUPER, V, exec, tip paste\n"
+        echo -e "  • \033[1mCachyOS Noctalia Lua (~/.config/hypr/config/binds.lua):\033[0m"
+        echo -e "    hl.bind(\"SUPER\", \"V\", \"exec\", \"tip paste\")"
+    elif pgrep -x "sway" &>/dev/null || [[ "$compositor" =~ [Ss]way ]]; then
+        echo -e "\033[36m▶ Dành cho Sway (~/.config/sway/config):\033[0m"
+        echo -e "    bindsym \$mod+v exec tip paste"
+    elif pgrep -x "i3" &>/dev/null || [[ "$compositor" =~ [iI]3 ]]; then
+        echo -e "\033[36m▶ Dành cho i3 (~/.config/i3/config):\033[0m"
+        echo -e "    bindsym \$mod+v exec tip paste"
+    elif pgrep -x "kwin_wayland" &>/dev/null || pgrep -x "kwin_x11" &>/dev/null || [[ "$compositor" =~ (KDE|Plasma|KWin) ]]; then
+        echo -e "\033[36m▶ Dành cho KDE Plasma:\033[0m"
+        echo -e "    Vào System Settings -> Shortcuts -> Custom Shortcuts -> Add Command:"
+        echo -e "    Tên: Terminal Image Paste"
+        echo -e "    Lệnh thực thi: tip paste"
+    elif pgrep -x "gnome-shell" &>/dev/null || [[ "$compositor" =~ (GNOME|Mutter) ]]; then
+        echo -e "\033[36m▶ Dành cho GNOME:\033[0m"
+        echo -e "    Vào Settings -> Keyboard -> Keyboard Shortcuts -> Custom Shortcuts (+):"
+        echo -e "    Tên: Terminal Image Paste"
+        echo -e "    Lệnh thực thi: tip paste"
+    else
+        echo -e "\033[36m▶ Cấu hình chung cho Window Manager / Desktop:\033[0m"
+        echo -e "    Tạo một phím tắt gọi lệnh: \033[32mtip paste\033[0m"
+    fi
+    echo ""
+}
+
+# Coordinate shortcut installation: ONLY Niri is automated, others display manual setup guide
 tip_shortcut_install() {
     local hotkey="${1:-$HOTKEY}"
     local compositor="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
 
-    # Check GNOME
-    if pgrep -x "gnome-shell" >/dev/null 2>&1 || [[ "$compositor" =~ (GNOME|Mutter) ]]; then
-        tip_shortcut_install_gnome "$hotkey"
-        return $?
-    fi
-
-    # Check KDE Plasma
-    if pgrep -x "kwin_wayland" >/dev/null 2>&1 || pgrep -x "kwin_x11" >/dev/null 2>&1 || [[ "$compositor" =~ (KDE|Plasma|KWin) ]]; then
-        tip_shortcut_install_kde "$hotkey"
-        return $?
-    fi
-
-    # Check LXDE / Openbox
-    if pgrep -x "openbox" >/dev/null 2>&1 || [[ "$compositor" =~ (LXDE|Openbox|OPENBOX) ]] || [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/openbox/lxde-rc.xml" ]]; then
-        tip_shortcut_install_lxde "$hotkey"
-        return $?
-    fi
-
-    # Check Niri
+    # Check Niri: duy nhất Niri được tích hợp tự động vào file cấu hình config.kdl
     if pgrep -x "niri" >/dev/null 2>&1 || [[ "$compositor" =~ [Nn]iri ]] || [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]]; then
         tip_shortcut_install_niri "$hotkey"
         return $?
     fi
 
-    echo "Automatic shortcut installation not yet supported for: $compositor" >&2
-    echo "You can manually bind shortcut $hotkey to run: tip paste" >&2
-    return 1
+    # Các compositor / desktop khác: in hướng dẫn tự gán phím tắt
+    tip_shortcut_show_manual_guide "$hotkey"
+    return 0
 }

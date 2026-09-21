@@ -21,14 +21,16 @@ _tip_inject_wayland() {
     # 1. Hyprland: Native sendshortcut dispatcher (zero virtual-keyboard bug, zero scancode collision)
     if $is_hyprland; then
         sleep 0.1
-        # Try Hyprland 0.55+ syntax ('active'), then classic variations
-        if hyprctl dispatch sendshortcut "CTRL SHIFT, V, active" &>/dev/null || \
+        # Try Hyprland Lua dispatcher (CachyOS / Hyprland 0.56+), then standard C++ sendshortcut dispatchers
+        if hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })' &>/dev/null || \
+           hyprctl dispatch sendshortcut "CTRL SHIFT, V, active" &>/dev/null || \
            hyprctl dispatch sendshortcut "CTRL_SHIFT, V, active" &>/dev/null || \
            hyprctl dispatch sendshortcut "SHIFT, Insert, active" &>/dev/null || \
            hyprctl dispatch sendshortcut "CTRL, V, active" &>/dev/null || \
            hyprctl dispatch sendshortcut "CTRL SHIFT, V" &>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 sleep 0.05
+                hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "", key = "Return" })' &>/dev/null || \
                 hyprctl dispatch sendshortcut ", Return, active" &>/dev/null || \
                 hyprctl dispatch sendshortcut ", Return" &>/dev/null || true
             fi
