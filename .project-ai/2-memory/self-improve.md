@@ -32,3 +32,7 @@
 - Lỗi: Dùng regex tìm kiếm `binds {` không neo ở đầu dòng (`^`) khiến script chèn nhầm vào khối con `recent-windows { binds { ... } }` của Niri.
 - Sửa đổi: Khi thao tác với file cấu hình phân cấp, luôn neo regex ở cấp ngoài cùng (`^block_name\s*\{`) để tránh chèn sai block.
 
+### MISTAKE-007: Nuốt lỗi công cụ gõ phím ảo trên Wayland
+- Lỗi: Dùng `wtype ... 2>/dev/null` rồi `return 0` vô điều kiện khiến `tip` im lặng nuốt lỗi khi chạy trên compositor không hỗ trợ virtual keyboard (KWin/Mutter).
+- Sửa đổi: Luôn kiểm tra exit code thực tế của các công cụ Wayland (`if wtype ...; then ...; fi`), ghi log cảnh báo chi tiết và kích hoạt fallback (`ydotool` / stdout) thay vì trả về thành công giả.
+
