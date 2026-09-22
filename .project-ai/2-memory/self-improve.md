@@ -36,4 +36,6 @@
 - Lỗi: Đưa snippet phím tắt cho Hyprland Lua dùng dạng chuỗi rời rạc khiến trình phân giải Lua của Hyprland báo lỗi cú pháp thiếu dispatcher.
 - Sửa đổi: Khi cung cấp snippet cấu hình cho các Window Manager có DSL/ngôn ngữ riêng (như Lua, KDL, Nix), luôn kiểm tra kỹ signature của API/dispatcher (`hl.dsp.*`) và quy tắc nối phím trước khi đưa vào tài liệu hướng dẫn.
 
-
+### MISTAKE-009: Lệnh in fallback thiếu ký tự xuống dòng (\n) và rò rỉ stdout của công cụ phụ trợ
+- Lỗi: Dùng `printf "%s"` không có `\n` khiến dòng prompt terminal bị dính liền vào chuỗi đường dẫn; đồng thời chỉ dùng `2>/dev/null` không chặn được lỗi in ra `stdout` của `ydotool`.
+- Sửa đổi: Luôn dùng `echo "$text"` (có `\n`) cho output in trực tiếp ra terminal; luôn dùng `&>/dev/null` để chặn cả stdout và stderr khi gọi các công cụ ảo bàn phím trong script nền.
