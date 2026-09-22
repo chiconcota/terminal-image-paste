@@ -68,17 +68,17 @@ _tip_inject_wayland() {
     if command -v ydotool &>/dev/null; then
         sleep 0.2
         # Preferred: Fast Clipboard Paste via Ctrl+Shift+V (instant, clean, zero double-output)
-        if ydotool key 29:1 42:1 47:1 47:0 42:0 29:0 2>/dev/null; then
+        if ydotool key 29:1 42:1 47:1 47:0 42:0 29:0 &>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 sleep 0.05
-                ydotool key 28:1 28:0 2>/dev/null || true
+                ydotool key 28:1 28:0 &>/dev/null || true
             fi
             return 0
         fi
         # Secondary fallback: Direct typing via ydotool
-        if ydotool type -- "$text" 2>/dev/null; then
+        if ydotool type -- "$text" &>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
-                ydotool key 28:1 28:0 2>/dev/null || true
+                ydotool key 28:1 28:0 &>/dev/null || true
             fi
             return 0
         fi

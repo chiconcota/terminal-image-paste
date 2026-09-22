@@ -58,6 +58,13 @@ cd terminal-image-paste
 sudo ./install.sh --system
 ```
 
+> 💡 **Tip for User Mode (`~/.local/bin`):** If `command 'tip' not found` right after installation, reload your shell profile:
+> ```bash
+> source ~/.profile
+> # or
+> export PATH="$HOME/.local/bin:$PATH"
+> ```
+
 To uninstall at any time:
 ```bash
 ./install.sh --uninstall

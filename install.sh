@@ -195,7 +195,9 @@ do_install() {
     if [[ "$INSTALL_TYPE" == "user" ]]; then
         if [[ ":$PATH:" != *":${BIN_DIR}:"* ]]; then
             warn "${BIN_DIR} is not in your current PATH!"
-            echo -e "${C_DIM}Add this to your shell profile (~/.bashrc, ~/.zshrc, or ~/.config/fish/config.fish):${C_RESET}"
+            echo -e "${C_DIM}Run this in your terminal or add to ~/.bashrc:${C_RESET}"
+            echo -e "  ${C_BOLD}source ~/.profile${C_RESET}"
+            echo -e "  ${C_DIM}# hoặc:${C_RESET}"
             echo -e "  ${C_BOLD}export PATH=\"\$HOME/.local/bin:\$PATH\"${C_RESET}\n"
         fi
         echo -e "${C_DIM}Desktop shortcut note: In GNOME/KDE Settings, use '${BIN_DIR}/tip paste' if '${BIN_DIR}' is not in your system environment.${C_RESET}\n"
