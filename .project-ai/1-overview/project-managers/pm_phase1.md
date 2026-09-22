@@ -18,6 +18,8 @@
 - [x] Tương thích Hyprland (0.56+ Lua): Giải quyết dứt điểm va chạm scancode `btop`, tích hợp native Lua dispatcher `hl.dsp.send_shortcut`.
 - [x] Tinh giản chiến lược phím tắt: Chuyển đổi toàn diện sang Shortcut Setup Guide & Snippets (Zero-Risk), loại bỏ auto-modify dotfiles.
 - [x] Phát hành v1.1.1: Tương thích hoàn toàn Hyprland Lua (`hl.bind`), bổ sung hướng dẫn `ydotool` cho KDE & GNOME Wayland.
-- [ ] Kiểm thử runtime trên máy thật Ubuntu (Ubuntu Real - GNOME Wayland/X11) (Trọng tâm phiên tiếp theo).
-- [ ] Mở rộng kiểm thử sang Fedora và openSUSE.
+- [x] Kiểm thử runtime trên máy thật Ubuntu 26.04 (GNOME Wayland): Sửa lỗi lặp chữ ydotool qua Ctrl+Shift+V, fix prompt collision, bổ sung hướng dẫn reload PATH và udev rule cho `/dev/uinput`.
+- [x] Kiểm thử runtime trên máy thật Fedora 44 (KDE Plasma Wayland): Sửa lỗi thiếu user service `ydotool.service`, fix quyền uinput `chmod 666` và SELinux `setenforce 0`.
+- [x] Phát hành phiên bản `v1.1.2` đồng bộ đa nền tảng Ubuntu & Fedora.
+- [ ] Mở rộng kiểm thử sang openSUSE và Debian Pure nếu cần.
 

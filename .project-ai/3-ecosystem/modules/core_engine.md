@@ -37,7 +37,7 @@
   - **Preferred (Hyprland):** Gọi trực tiếp native dispatcher qua Lua IPC `hyprctl dispatch 'hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "v" })'`, cô lập hoàn toàn không dùng `wtype` trên Hyprland để triệt tiêu lỗi scancode va chạm phím tắt `btop`.
   - **Preferred (Wayland nói chung - Niri/Sway):** Clipboard Injection qua `wl-copy` (cả Clipboard & Primary) rồi gửi phím `Ctrl+Shift+V` qua `wtype`.
   - **X11 Key Grab Protection:** Sử dụng `sleep 0.25s` để đảm bảo Window Manager (Openbox, XFCE, i3) giải phóng toàn quyền bàn phím (`XGrabKeyboard`), nạp chuỗi vào cả `clipboard` và `primary selection`.
-  - **Fail-Safe & Multi-Compositor Fallback:** Bắt chính xác exit code của `wtype`; nếu compositor không hỗ trợ `virtual-keyboard-v1` (như KWin của KDE hay Mutter của GNOME), tự động chuyển sang `ydotool` (thông qua `/dev/uinput`), hoặc in trực tiếp ra `stdout`.
+  - **Fail-Safe & Multi-Compositor Fallback:** Bắt chính xác exit code của `wtype`; nếu compositor không hỗ trợ `virtual-keyboard-v1` (như KWin của KDE hay Mutter của GNOME), tự động chuyển sang `ydotool` phát phím tắt `Ctrl+Shift+V` (`ydotool key 29:1 42:1 47:1 47:0 42:0 29:0`) với độ trễ `sleep 0.2s` nhả phím vật lý, hoặc in trực tiếp ra `stdout` có ngắt dòng `echo "$text"` tránh dính prompt terminal.
 
 ### `lib/doctor.sh`
 - `tip_run_doctor()`: Chẩn đoán môi trường OS, display server (Wayland/X11), Desktop/Compositor (Niri, Hyprland, Sway, KDE Plasma, GNOME, LXDE / Openbox). Cảnh báo khả năng tương thích của `wtype` và kiểm tra trạng thái hoạt động của `ydotool`/`ydotoold`.

@@ -1,20 +1,24 @@
 # CHECKPOINT & PROGRESS HANDOVER (checkpoint.md)
-@status: PHASE 3 (v1.1.2 RELEASED 🟢 -> TESTED ON UBUNTU 26.04 🎯) | @git_branch: main | @last_update: 2026-09-22
+@status: PHASE 3 (v1.1.2 RELEASED 🟢 -> UBUNTU 26.04 & FEDORA 44 VERIFIED 🎯) | @git_branch: main | @last_update: 2026-09-22
 
 ## 1. TRẠNG THÁI HIỆN TẠI (CURRENT STATUS)
 - **Phase 1 & 2:** Hoàn tất 100% (Core Engine, TUI Setup, Localization, GitHub Release).
 - **Phase 3 (Tiến độ mới nhất trong phiên 8):**
-  - **Sửa lỗi lặp chữ ydotool & dính prompt:** Nâng cấp `lib/injector.sh` dùng `ydotool key` (Ctrl+Shift+V) kèm `sleep 0.2` nhả phím vật lý, dán tức thì không lặp chữ. Chuẩn hóa fallback stdout dùng `echo "$text"` có xuống dòng.
-  - **Cập nhật Shortcut Guide & Snippets:** Bổ sung udev rule `/etc/udev/rules.d/80-uinput.rules` và cấp quyền `/dev/uinput` cho Ubuntu/Debian; nêu rõ command `~/.local/bin/tip paste` khi cài user mode.
+  - **Ubuntu 26.04 (GNOME Wayland):**
+    + Sửa lỗi lặp chữ ydotool & dính prompt: Nâng cấp `lib/injector.sh` dùng `ydotool key` (Ctrl+Shift+V) kèm `sleep 0.2` nhả phím vật lý.
+    + Chuẩn hóa fallback stdout dùng `echo "$text"` có xuống dòng (`\n`).
+    + Bổ sung gợi ý reload PATH (`source ~/.profile` hoặc `export PATH="$HOME/.local/bin:$PATH"`).
+  - **Fedora 44 (KDE Plasma Wayland):**
+    + Phát hiện và xử lý lỗi thiếu user unit: `install.sh` tự tạo `~/.config/systemd/user/ydotool.service`.
+    + Tài liệu hóa cách mở quyền `/dev/uinput` (`sudo chmod 666 /dev/uinput`) và xử lý chặn SELinux (`sudo setenforce 0`).
   - **Tối ưu install.sh & doctor.sh:** Tự tạo sẵn `~/.local/state/tip` và `~/.config/tip`; sửa gợi ý service `ydotool`.
-  - **Nâng cấp phiên bản v1.1.2:** Đã đồng bộ `bin/tip`, `aur/PKGBUILD`, `aur/.SRCINFO`.
+  - **Phát hành phiên bản v1.1.2:** Đã đồng bộ mã nguồn, README, AUR và đẩy lên GitHub.
 
 ## 2. CÔNG VIỆC BÀN GIAO CHO PHIÊN TIẾP THEO (NEXT TASKS)
-1. **Kiểm thử trực tiếp trên máy thật Ubuntu (Ubuntu 26.04 GNOME Wayland):**
-   - Chạy `git pull` hoặc chạy lại trình cài đặt.
-   - Thử nghiệm gán phím tắt `Shift+Super+V` trỏ tới `/home/$USER/.local/bin/tip paste`.
-   - Kiểm tra thao tác dán ảnh thực tế bằng phím tắt.
-2. **Kiểm thử tiếp theo:** Mở rộng kiểm thử sang Fedora và openSUSE nếu cần.
+1. **Kiểm thử môi trường tiếp theo:**
+   - Kiểm thử trên openSUSE Tumbleweed và Debian 12/Testing nếu cần.
+   - Kiểm tra tính ổn định lâu dài của daemon ydotool trên các bản phân phối Wayland.
+2. **Cân nhắc đóng gói RPM / Copr:** Có thể nghiên cứu tạo spec file cho Fedora Copr nếu có nhu cầu.
 
 ## 3. DANH SÁCH FILE LIÊN QUAN
 - `1-overview/system_map.md`
