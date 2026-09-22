@@ -1,5 +1,5 @@
 # AGENT SELF-IMPROVEMENT LOG (self-improve.md)
-@status: ACTIVE | @last_update: 2026-09-20
+@status: ACTIVE | @last_update: 2026-09-22
 
 > Nhật ký tự cải thiện hành vi và sửa sai của Agent. Chứa các lỗi thao tác thực tế và quy tắc tự sửa lỗi.
 > **Luật dọn dẹp:** File này không được vượt quá 80 dòng. Các lỗi đã giải quyết (Resolved) sau 3 phiên sẽ được lưu trữ.
@@ -31,4 +31,9 @@
 ### MISTAKE-007: Nuốt lỗi công cụ gõ phím ảo trên Wayland
 - Lỗi: Dùng `wtype ... 2>/dev/null` rồi `return 0` vô điều kiện khiến `tip` im lặng nuốt lỗi khi chạy trên compositor không hỗ trợ virtual keyboard (KWin/Mutter).
 - Sửa đổi: Luôn kiểm tra exit code thực tế của các công cụ Wayland (`if wtype ...; then ...; fi`), ghi log cảnh báo chi tiết và kích hoạt fallback (`ydotool` / stdout) thay vì trả về thành công giả.
+
+### MISTAKE-008: Cú pháp hướng dẫn (Snippet) chưa đối chiếu sát với runtime thực tế của bản phân phối
+- Lỗi: Đưa snippet phím tắt cho Hyprland Lua dùng dạng chuỗi rời rạc khiến trình phân giải Lua của Hyprland báo lỗi cú pháp thiếu dispatcher.
+- Sửa đổi: Khi cung cấp snippet cấu hình cho các Window Manager có DSL/ngôn ngữ riêng (như Lua, KDL, Nix), luôn kiểm tra kỹ signature của API/dispatcher (`hl.dsp.*`) và quy tắc nối phím trước khi đưa vào tài liệu hướng dẫn.
+
 
