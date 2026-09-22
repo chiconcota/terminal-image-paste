@@ -83,11 +83,18 @@ tip doctor
 - **Debian / Ubuntu:** `sudo apt install wl-clipboard ydotool timg` (GNOME Wayland) or `sudo apt install xclip xdotool` (X11)
 - **Fedora:** `sudo dnf install wl-clipboard ydotool timg` (GNOME Wayland)
 
-*(Note for GNOME / KDE Wayland: To enable `ydotool` input simulation on Ubuntu/Debian, grant `/dev/uinput` permissions and enable service)*:
+*(Note for GNOME / KDE Wayland: To enable `ydotool` input simulation on Ubuntu/Debian & Fedora)*:
 ```bash
+# 1. Grant /dev/uinput permissions:
 echo 'KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/80-uinput.rules
 sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput
-sudo usermod -aG input $USER && systemctl --user restart ydotool
+sudo usermod -aG input $USER
+
+# 2. For Fedora (if SELinux restricts /dev/uinput):
+sudo setenforce 0
+
+# 3. Start or restart ydotool service:
+systemctl --user restart ydotool
 ```
 
 ### 3. Configure
@@ -173,7 +180,8 @@ bindsym $mod+Ctrl+v exec tip paste
 4. Assign shortcut: `Meta+Ctrl+V` (or `Meta+Shift+V`) and click **Apply**.
 
 > **Note for KDE Wayland:** KWin restricts third-party virtual keyboards (`wtype`). Install and configure `ydotool`:
-> `echo 'KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/80-uinput.rules && sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput && sudo usermod -aG input $USER && systemctl --user restart ydotool`
+> `sudo chmod 666 /dev/uinput && sudo usermod -aG input $USER && systemctl --user restart ydotool`
+> *(On Fedora with SELinux, also run `sudo setenforce 0` if uinput access is blocked)*
 
 ---
 
@@ -184,7 +192,8 @@ bindsym $mod+Ctrl+v exec tip paste
 4. Assign shortcut: `Super+Ctrl+V` (or `Super+Shift+V`).
 
 > **Note for GNOME Wayland:** Install `ydotool` and grant `/dev/uinput` access to allow keystroke injection across Wayland clients:
-> `echo 'KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/80-uinput.rules && sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput && sudo usermod -aG input $USER && systemctl --user restart ydotool`
+> `sudo chmod 666 /dev/uinput && sudo usermod -aG input $USER && systemctl --user restart ydotool`
+> *(On Fedora with SELinux, also run `sudo setenforce 0` if uinput access is blocked)*
 
 ---
 

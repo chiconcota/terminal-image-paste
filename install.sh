@@ -118,8 +118,9 @@ check_dependencies() {
         esac
         if [[ " ${missing_pkgs[*]} " =~ " ydotool " ]]; then
             echo -e "${C_DIM}Note for Wayland ydotool (Ubuntu/Debian/Fedora):${C_RESET}"
-            echo -e "  Grant udev permission: ${C_YELLOW}echo 'KERNEL==\"uinput\", GROUP=\"input\", MODE=\"0660\", OPTIONS+=\"static_node=uinput\"' | sudo tee /etc/udev/rules.d/80-uinput.rules${C_RESET}"
-            echo -e "  Reload & restart:      ${C_YELLOW}sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput && sudo usermod -aG input \$USER && systemctl --user restart ydotool${C_RESET}\n"
+            echo -e "  Grant permissions:  ${C_YELLOW}sudo chmod 666 /dev/uinput && sudo usermod -aG input \$USER${C_RESET}"
+            echo -e "  For Fedora SELinux: ${C_YELLOW}sudo setenforce 0${C_RESET}"
+            echo -e "  Restart service:    ${C_YELLOW}systemctl --user restart ydotool${C_RESET}\n"
         fi
         echo ""
     else
@@ -185,6 +186,23 @@ do_install() {
         install -m 644 "$f" "${LIB_DIR}/"
     done
     success "Installed libraries -> ${LIB_DIR}/"
+
+    # Setup ydotool user service if missing (e.g. Fedora only packages system service)
+    if command -v ydotool &>/dev/null && [[ ! -f "${HOME}/.config/systemd/user/ydotool.service" ]]; then
+        mkdir -p "${HOME}/.config/systemd/user"
+        cat << 'EOF' > "${HOME}/.config/systemd/user/ydotool.service"
+[Unit]
+Description=ydotool daemon
+
+[Service]
+ExecStart=/usr/bin/ydotoold
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+        systemctl --user daemon-reload 2>/dev/null || true
+    fi
 
     # Cleanup temp repo if used
     if [[ -n "$temp_repo" && -d "$temp_repo" ]]; then
