@@ -17,6 +17,7 @@
 - [x] Tương thích LXDE (Openbox X11): Sửa lỗi key grab `sleep 0.25s` và hỗ trợ cấu hình Openbox XML.
 - [x] Tương thích Hyprland (0.56+ Lua): Giải quyết dứt điểm va chạm scancode `btop`, tích hợp native Lua dispatcher `hl.dsp.send_shortcut`.
 - [x] Tinh giản chiến lược phím tắt: Chuyển đổi toàn diện sang Shortcut Setup Guide & Snippets (Zero-Risk), loại bỏ auto-modify dotfiles.
-- [ ] Kiểm thử runtime gói AUR `yay -S terminal-image-paste-git` trực tiếp trên **Niri** (Trọng tâm phiên tiếp theo).
-- [ ] Kiểm thử runtime thực tế trên GNOME và các bản phân phối khác: Ubuntu/Debian, Fedora, openSUSE.
+- [x] Phát hành v1.1.1: Tương thích hoàn toàn Hyprland Lua (`hl.bind`), bổ sung hướng dẫn `ydotool` cho KDE & GNOME Wayland.
+- [ ] Kiểm thử runtime trên máy thật Ubuntu (Ubuntu Real - GNOME Wayland/X11) (Trọng tâm phiên tiếp theo).
+- [ ] Mở rộng kiểm thử sang Fedora và openSUSE.
 

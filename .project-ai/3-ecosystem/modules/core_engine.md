@@ -43,15 +43,16 @@
 - `tip_run_doctor()`: Chẩn đoán môi trường OS, display server (Wayland/X11), Desktop/Compositor (Niri, Hyprland, Sway, KDE Plasma, GNOME, LXDE / Openbox). Cảnh báo khả năng tương thích của `wtype` và kiểm tra trạng thái hoạt động của `ydotool`/`ydotoold`.
 
 ### `lib/tui.sh`
-- `tip_tui_main_menu()`: Bảng điều khiển tương tác TUI (chọn format, auto-enter, hotkey, log level, doctor, log).
-- `tip_tui_select_format()`, `tip_tui_toggle_auto_enter()`, `tip_tui_select_log_level()`, `tip_tui_select_hotkey()`.
-- **Mục [3] Tinh giản phím tắt:** Tự động hỏi cài đặt cho Niri (`config.kdl`); với tất cả các môi trường khác, in hướng dẫn copy-paste snippet rõ ràng, không can thiệp file cấu hình.
+- `tip_tui_main_menu()`: Bảng điều khiển tương tác TUI (chọn format, auto-enter, xem hướng dẫn phím tắt, log level, doctor, log).
+- `tip_tui_select_format()`, `tip_tui_toggle_auto_enter()`, `tip_tui_select_log_level()`.
+- `tip_tui_show_shortcut_guide()`: Menu hiển thị hướng dẫn cấu hình phím tắt cho môi trường hiện tại hoặc hiển thị toàn bộ snippets của mọi window manager.
 
 ### `lib/shortcut.sh`
-- `tip_decode_csi_u(input)`: Giải mã chuỗi escape CSI u từ Ghostty/Kitty (ví dụ: `^[[98;5u` -> `Ctrl+B`).
-- `tip_shortcut_to_niri(raw)` / `tip_shortcut_install_niri(hotkey)`: Định dạng và ghi phím tắt tự động vào `~/.config/niri/config.kdl`.
-- `tip_shortcut_show_manual_guide(hotkey)`: In đoạn cấu hình mẫu (snippet) dành riêng cho từng môi trường (Hyprland hyprland.conf & binds.lua, Sway, i3, KDE Plasma, GNOME).
-- `tip_shortcut_install(hotkey)`: Điều hướng tự động: chỉ ghi file đối với Niri, các môi trường khác gọi `tip_shortcut_show_manual_guide`.
+- `tip_detect_wm()`: Tự động nhận diện Window Manager / Desktop Environment (`niri`, `hyprland`, `sway`, `i3`, `kde`, `gnome`, `openbox`, `generic`).
+- `tip_shortcut_show_guide [target]`: In hướng dẫn và snippet cấu hình phím tắt chuẩn xác cho môi trường được chọn (hoặc tự phát hiện nếu không truyền đối số).
+- `tip_shortcut_guide_all()`: In danh mục snippet hoàn chỉnh cho tất cả các window manager được hỗ trợ.
+- `tip_shortcut_install()`: Alias tương thích ngược trỏ về `tip_shortcut_show_guide`.
+- **Zero-Risk Policy:** Tuyệt đối không tự ý ghi đè file cấu hình người dùng; chỉ cung cấp snippet chuẩn để người dùng chủ động tích hợp.
 
 ---
 
