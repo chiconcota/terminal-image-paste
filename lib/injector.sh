@@ -66,13 +66,23 @@ _tip_inject_wayland() {
 
     # 4. Fallback: ydotool (works globally on Wayland/KDE/GNOME via /dev/uinput)
     if command -v ydotool &>/dev/null; then
-        if ydotool type "$text" 2>/dev/null; then
+        sleep 0.2
+        # Preferred: Fast Clipboard Paste via Ctrl+Shift+V (instant, clean, zero double-output)
+        if ydotool key 29:1 42:1 47:1 47:0 42:0 29:0 2>/dev/null; then
+            if [[ "$auto_enter" == "true" ]]; then
+                sleep 0.05
+                ydotool key 28:1 28:0 2>/dev/null || true
+            fi
+            return 0
+        fi
+        # Secondary fallback: Direct typing via ydotool
+        if ydotool type -- "$text" 2>/dev/null; then
             if [[ "$auto_enter" == "true" ]]; then
                 ydotool key 28:1 28:0 2>/dev/null || true
             fi
             return 0
         fi
-        tip_log_warn "ydotool command failed (ydotoold service might not be running)."
+        tip_log_warn "ydotool command failed (ydotool service might not be running or lacks /dev/uinput permissions)."
     fi
 
     return 1
@@ -140,7 +150,6 @@ tip_inject_text() {
     fi
 
     # Fallback khi công cụ gõ phím ảo thất bại hoặc không được compositor hỗ trợ
-    printf "%s" "$text"
-    [[ "$auto_enter" == "true" ]] && echo ""
+    echo "$text"
     return 0
 }

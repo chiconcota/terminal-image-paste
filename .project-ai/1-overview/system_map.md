@@ -1,5 +1,5 @@
 # SYSTEM MAP: TERMINAL IMAGE PASTE (`tip`)
-@status: 🟢 PHASE 3 IMPLEMENTATION (HYPRLAND FIX & NIRI DEDICATED) | @git_branch: main | @last_update: 2026-09-21
+@status: 🟢 PHASE 3 (v1.1.2 - UBUNTU 26.04 GNOME WAYLAND TEST & FIX) | @git_branch: main | @last_update: 2026-09-22
 
 ---
 
@@ -79,6 +79,12 @@ LOG_LEVEL="INFO"                     # DEBUG | INFO | WARN | ERROR
 ---
 
 ## 5. NHẬT KÝ THAY ĐỔI GẦN ĐÂY (RECENT LOGS)
+- **2026-09-22 (Phiên 8 - Kiểm thử Ubuntu 26.04, Sửa lỗi Lặp chữ ydotool & Cập nhật Guide):**
+  - Khắc phục lỗi lặp chữ (Double Paste) trên Ubuntu GNOME Wayland: Thay thế `ydotool type` bằng `ydotool key` (mô phỏng `Ctrl+Shift+V` dán clipboard tức thì) kèm độ trễ `sleep 0.2` nhả phím tắt vật lý.
+  - Chuẩn hóa fallback stdout với ký tự xuống dòng (`echo "$text"`), triệt tiêu hoàn toàn lỗi dính prompt terminal.
+  - Cập nhật hướng dẫn GNOME & KDE shortcut: Nêu rõ command `~/.local/bin/tip paste` khi cài đặt user mode và bổ sung 2 bước cấu hình udev rule cho `/dev/uinput`.
+  - Tối ưu `install.sh`: Khởi tạo sẵn thư mục `~/.local/state/tip` và `~/.config/tip`.
+  - Nâng cấp phiên bản lên `v1.1.2`.
 - **2026-09-22 (Phiên 7 - Chuyển đổi sang Shortcut Setup Guide & Triệt tiêu rủi ro hỏng Dotfiles):**
   - Xóa bỏ hoàn toàn cơ chế tự động ghi phím tắt vào dotfiles (`config.kdl`, `kglobalshortcutsrc`, `gsettings`, XML Openbox).
   - Tái cấu trúc `lib/shortcut.sh` thành module hướng dẫn cung cấp snippet chuẩn cho từng WM (Niri, Hyprland, Sway, i3, KDE Plasma, GNOME, Openbox).

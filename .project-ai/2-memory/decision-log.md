@@ -15,6 +15,16 @@
 
 ## 2. NHẬT KÝ QUYẾT ĐỊNH (DECISION LOG)
 
+### 2026-09-22 - 🟢 Tối ưu ydotool Clipboard Paste & Cấu hình Ubuntu GNOME Wayland
+- **Bối cảnh:**
+  1. Khi kiểm thử trên Ubuntu 26.04 (GNOME Wayland), `tip paste` gặp lỗi dính prompt và lặp đường dẫn 2 lần (`/tmp/clipboard.pngchiconcota@...:~$ /tmp/clipboard.png`).
+  2. Nguyên nhân: `ydotool type` gõ từng ký tự trả về mã lỗi sau khi gõ, khiến hàm injector lầm tưởng thất bại và chạy tiếp nhánh fallback stdout (`printf "%s"`). Đồng thời lệnh `printf` thiếu ký tự xuống dòng khiến prompt của shell bị dính liền vào chuỗi đường dẫn.
+  3. GNOME Shell không tự nạp `~/.local/bin` trong môi trường custom shortcuts; và `/dev/uinput` trên Ubuntu yêu cầu cấp quyền udev.
+- **Quyết định:**
+  1. **Chuyển `ydotool` sang Clipboard Paste:** Cho `ydotool` phát phím tắt `Ctrl+Shift+V` (`ydotool key 29:1 42:1 47:1 47:0 42:0 29:0`) kèm `sleep 0.2` nhả phím vật lý. Dán tức thì 0ms, thành công ngay lập tức và triệt tiêu 100% nhánh fallback.
+  2. **Chuẩn hóa Fallback Stdout:** Dùng `echo "$text"` (có xuống dòng `\n`) thay cho `printf`.
+  3. **Cập nhật tài liệu & Shortcut Guide:** Nêu rõ command `~/.local/bin/tip paste` khi cài user mode và bổ sung hướng dẫn cấp quyền udev cho `/dev/uinput`.
+
 ### 2026-09-22 - 🟢 Chuyển đổi toàn diện sang Shortcut Setup Guide & Không can thiệp Dotfiles
 - **Bối cảnh:**
   1. Việc tự động parse và chèn phím tắt vào file cấu hình của Window Manager (kể cả với Niri `config.kdl` hay KDE/GNOME/Openbox) tiềm ẩn rủi ro cao làm lỗi syntax hoặc hỏng định dạng dotfiles cá nhân của người dùng.

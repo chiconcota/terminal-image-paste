@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # bin/tip - Terminal Image Paste CLI Entrypoint
-# Version 1.1.1
+# Version 1.1.2
 
 set -e
 
-TIP_VERSION="1.1.1"
+TIP_VERSION="1.1.2"
 SOURCE_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
 
 # Resolve library directory across development, user, and system installations

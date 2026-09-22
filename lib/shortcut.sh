@@ -88,8 +88,10 @@ tip_shortcut_guide_kde() {
     echo -e "  4. Command: ${C_GREEN}tip paste${C_RESET}"
     echo -e "  5. Trigger: Assign ${C_YELLOW}Meta+Ctrl+V${C_RESET} (or ${C_YELLOW}Meta+Shift+V${C_RESET}) and click Apply."
     echo ""
-    echo -e "  ${C_DIM}💡 Note for KDE Wayland: To enable automated keystroke injection:${C_RESET}"
-    echo -e "     ${C_YELLOW}sudo usermod -aG input \$USER && systemctl --user enable --now ydotool${C_RESET}"
+    echo -e "  ${C_DIM}💡 Note for KDE Wayland: To enable automated keystroke injection (ydotool):${C_RESET}"
+    echo -e "     ${C_YELLOW}echo 'KERNEL==\"uinput\", GROUP=\"input\", MODE=\"0660\", OPTIONS+=\"static_node=uinput\"' | sudo tee /etc/udev/rules.d/80-uinput.rules${C_RESET}"
+    echo -e "     ${C_YELLOW}sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput${C_RESET}"
+    echo -e "     ${C_YELLOW}sudo usermod -aG input \$USER && systemctl --user restart ydotool${C_RESET}"
 }
 
 tip_shortcut_guide_gnome() {
@@ -97,11 +99,15 @@ tip_shortcut_guide_gnome() {
     echo -e "  Configure via Settings GUI:"
     echo -e "  1. Open ${C_BOLD}Settings${C_RESET} ➔ ${C_BOLD}Keyboard${C_RESET} ➔ ${C_BOLD}Keyboard Shortcuts${C_RESET} ➔ ${C_BOLD}Custom Shortcuts (+)${C_RESET}"
     echo -e "  2. Name: ${C_GREEN}Terminal Image Paste${C_RESET}"
-    echo -e "  3. Command: ${C_GREEN}tip paste${C_RESET}"
+    echo -e "  3. Command: ${C_GREEN}tip paste${C_RESET} (or ${C_GREEN}${HOME}/.local/bin/tip paste${C_RESET} if installed in user mode)"
     echo -e "  4. Shortcut: Press ${C_YELLOW}Super+Ctrl+V${C_RESET} (or ${C_YELLOW}Super+Shift+V${C_RESET})"
     echo ""
-    echo -e "  ${C_DIM}💡 Note for GNOME Wayland: To enable automated keystroke injection:${C_RESET}"
-    echo -e "     ${C_YELLOW}sudo usermod -aG input \$USER && systemctl --user enable --now ydotool${C_RESET}"
+    echo -e "  ${C_DIM}💡 Note for GNOME Wayland (Ubuntu/Debian) - Enable ydotool & permissions:${C_RESET}"
+    echo -e "     ${C_YELLOW}# 1. Grant /dev/uinput permissions:${C_RESET}"
+    echo -e "     ${C_YELLOW}echo 'KERNEL==\"uinput\", GROUP=\"input\", MODE=\"0660\", OPTIONS+=\"static_node=uinput\"' | sudo tee /etc/udev/rules.d/80-uinput.rules${C_RESET}"
+    echo -e "     ${C_YELLOW}sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput${C_RESET}"
+    echo -e "     ${C_YELLOW}# 2. Add user to input group and restart service:${C_RESET}"
+    echo -e "     ${C_YELLOW}sudo usermod -aG input \$USER && systemctl --user restart ydotool${C_RESET}"
 }
 
 tip_shortcut_guide_openbox() {

@@ -116,6 +116,11 @@ check_dependencies() {
                 echo -e "  ${C_BOLD}Install packages manually: ${missing_pkgs[*]}${C_RESET}"
                 ;;
         esac
+        if [[ " ${missing_pkgs[*]} " =~ " ydotool " ]]; then
+            echo -e "${C_DIM}Note for Wayland ydotool (Ubuntu/Debian/Fedora):${C_RESET}"
+            echo -e "  Grant udev permission: ${C_YELLOW}echo 'KERNEL==\"uinput\", GROUP=\"input\", MODE=\"0660\", OPTIONS+=\"static_node=uinput\"' | sudo tee /etc/udev/rules.d/80-uinput.rules${C_RESET}"
+            echo -e "  Reload & restart:      ${C_YELLOW}sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput && sudo usermod -aG input \$USER && systemctl --user restart ydotool${C_RESET}\n"
+        fi
         echo ""
     else
         success "All recommended dependencies are installed!"
@@ -169,7 +174,7 @@ do_install() {
     info "  Libraries destination: ${C_BOLD}${LIB_DIR}/${C_RESET}"
 
     # Create destination directories
-    mkdir -p "$BIN_DIR" "$LIB_DIR"
+    mkdir -p "$BIN_DIR" "$LIB_DIR" "${HOME}/.local/state/tip" "${HOME}/.config/tip"
 
     # Copy binary
     install -m 755 "${script_dir}/bin/tip" "${BIN_DIR}/tip"
@@ -193,6 +198,7 @@ do_install() {
             echo -e "${C_DIM}Add this to your shell profile (~/.bashrc, ~/.zshrc, or ~/.config/fish/config.fish):${C_RESET}"
             echo -e "  ${C_BOLD}export PATH=\"\$HOME/.local/bin:\$PATH\"${C_RESET}\n"
         fi
+        echo -e "${C_DIM}Desktop shortcut note: In GNOME/KDE Settings, use '${BIN_DIR}/tip paste' if '${BIN_DIR}' is not in your system environment.${C_RESET}\n"
     fi
 
     echo ""

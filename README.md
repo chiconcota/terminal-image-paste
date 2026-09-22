@@ -76,7 +76,12 @@ tip doctor
 - **Debian / Ubuntu:** `sudo apt install wl-clipboard ydotool timg` (GNOME Wayland) or `sudo apt install xclip xdotool` (X11)
 - **Fedora:** `sudo dnf install wl-clipboard ydotool timg` (GNOME Wayland)
 
-*(Note: For GNOME / KDE Wayland, after installing `ydotool`, enable the background service: `sudo usermod -aG input $USER && systemctl --user enable --now ydotool`)*
+*(Note for GNOME / KDE Wayland: To enable `ydotool` input simulation on Ubuntu/Debian, grant `/dev/uinput` permissions and enable service)*:
+```bash
+echo 'KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/80-uinput.rules
+sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput
+sudo usermod -aG input $USER && systemctl --user restart ydotool
+```
 
 ### 3. Configure
 
@@ -157,22 +162,22 @@ bindsym $mod+Ctrl+v exec tip paste
 ### KDE Plasma (KWin)
 1. Open **System Settings** ➔ **Shortcuts** ➔ Click **Add New** ➔ **Command or Script**.
 2. Set Name: `Terminal Image Paste`
-3. Set Command: `tip paste`
+3. Set Command: `tip paste` (or `$HOME/.local/bin/tip paste` if installed in user mode)
 4. Assign shortcut: `Meta+Ctrl+V` (or `Meta+Shift+V`) and click **Apply**.
 
-> **Note for KDE Wayland:** KWin restricts third-party virtual keyboards (`wtype`). Install `ydotool` for automated keystroke injection:
-> `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
+> **Note for KDE Wayland:** KWin restricts third-party virtual keyboards (`wtype`). Install and configure `ydotool`:
+> `echo 'KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/80-uinput.rules && sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput && sudo usermod -aG input $USER && systemctl --user restart ydotool`
 
 ---
 
 ### GNOME
 1. Open **Settings** ➔ **Keyboard** ➔ **Keyboard Shortcuts** ➔ **Custom Shortcuts (+)**.
 2. Set Name: `Terminal Image Paste`
-3. Set Command: `tip paste`
+3. Set Command: `tip paste` (or `$HOME/.local/bin/tip paste` if installed in user mode)
 4. Assign shortcut: `Super+Ctrl+V` (or `Super+Shift+V`).
 
-> **Note for GNOME Wayland:** Install `ydotool` to allow keystroke injection across Wayland clients:
-> `sudo pacman -S ydotool && sudo usermod -aG input $USER && systemctl --user enable --now ydotool`
+> **Note for GNOME Wayland:** Install `ydotool` and grant `/dev/uinput` access to allow keystroke injection across Wayland clients:
+> `echo 'KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/80-uinput.rules && sudo udevadm control --reload-rules && sudo udevadm trigger && sudo chmod 666 /dev/uinput && sudo usermod -aG input $USER && systemctl --user restart ydotool`
 
 ---
 

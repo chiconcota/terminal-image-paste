@@ -96,7 +96,7 @@ tip_run_doctor() {
                 if pgrep -x ydotoold &>/dev/null; then
                     printf "  \033[0;32m✔\033[0m %-16s : \033[0;32mRunning\033[0m (Daemon is active)\n" "ydotoold"
                 else
-                    printf "  \033[0;33m!\033[0m %-16s : \033[0;33mNot running\033[0m (Run 'systemctl --user start ydotoold' or 'sudo ydotoold &')\n" "ydotoold"
+                    printf "  \033[0;33m!\033[0m %-16s : \033[0;33mNot running\033[0m (Run 'systemctl --user restart ydotool' or 'sudo ydotoold &')\n" "ydotoold"
                 fi
             fi
             _tip_doctor_check_cmd "wtype"   "Wayland virtual keyboard (Unsupported on KWin/Mutter)" "false"
